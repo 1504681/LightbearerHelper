@@ -8,26 +8,35 @@ A RuneLite plugin that nags you to do the Lightbearer ring swap in both directio
 
 ## Features
 
-### Lightbearer highlight
-- Highlight style: **Outline**, **Box**, **Fill** or **Underline**
-- Any colour (with alpha)
+Every item highlight (Lightbearer, other rings, spec items) has its own colour and any combination of:
+
+- **Outline** around the item sprite
+- **Box** around the inventory slot
+- **Fill** of the slot, with a configurable **fill opacity** (0–100%)
+- **Underline** bar under the slot
+- **Pulse**: fades the whole highlight between the colour and transparent. Speed and Smooth/Blink mode are shared in the **General** section.
+
+### Lightbearer
+- Default: light blue outline
 - **Mark worn ring to swap**: also highlights the ring in the worn-equipment tab that should come off
 
 ### Other rings
 - Free-text list, one item name per line (commas also work), `*` wildcards, case-insensitive, `#` comment lines
 - Defaults: `Ultor ring`, `Bellator ring`, `Magus ring`, `Venator ring`, `Berserker ring*`, `Ring of suffering*`
-- Own highlight style and colour
+- Default: cyan outline
 
 ### Spec items (optional, off by default)
 - Same list format; defaults cover claws, godswords, DWH, elder maul, DDS/abyssal dagger, dragon halberd, ZCB, blowpipe, nightmare staves
-- Own highlight style and colour
+- Default: the same light blue outline as the Lightbearer
 - **Skip when spec weapon wielded**: stop highlighting spec items once one of them is already equipped
 
-### Spec orb pulse
-- Oscillates the spec orb between its normal look and the **pulse colour** (the colour's alpha is the peak strength)
-- **Pulse period** 200–3000 ms for one full normal → colour → normal cycle
-- **Pulse mode**: Smooth fade or hard Blink
-- **Tint orb text**: also fades the percentage text towards the pulse colour
+### Spec orb
+Shown while spec is full and no listed ring is worn. Any combination of:
+- **Aura** (default on): glowing halo around the outside of the orb, with a configurable **aura size**
+- **Outline**: ring along the orb edge
+- **Fill**: tint inside the orb, with its own **fill opacity**
+- **Pulse** (default on): oscillates the decorations between the normal orb and the colour, with **pulse period** 200–3000 ms and Smooth or Blink mode
+- **Tint orb text**: also fades the percentage text towards the colour
 
 ## Testing locally
 
@@ -58,10 +67,11 @@ From an IDE: run the `LightbearerHelperLauncher` class with the `-ea` VM flag.
 
 | Section | Settings |
 |---|---|
-| Lightbearer | Highlight style, Highlight colour, Mark worn ring to swap |
-| Other rings | Rings (list), Highlight style, Highlight colour |
-| Spec items | Highlight spec items, Spec items (list), Skip when spec weapon wielded, Highlight style, Highlight colour |
-| Spec orb | Pulse spec orb, Pulse colour, Pulse period, Pulse mode, Tint orb text |
+| General | Item pulse period, Item pulse mode |
+| Lightbearer | Colour, Outline, Box, Fill, Fill opacity, Underline, Pulse, Mark worn ring to swap |
+| Other rings | Rings (list), Colour, Outline, Box, Fill, Fill opacity, Underline, Pulse |
+| Spec items | Highlight spec items, Spec items (list), Skip when spec weapon wielded, Colour, Outline, Box, Fill, Fill opacity, Underline, Pulse |
+| Spec orb | Highlight spec orb, Colour, Aura, Aura size, Outline, Fill, Fill opacity, Pulse, Pulse period, Pulse mode, Tint orb text |
 
 ## Plugin Hub
 
@@ -69,7 +79,7 @@ The repo is private while in development; the Plugin Hub builds straight from Gi
 
 ## Changelog
 
-- **1.0.0** — initial release: Lightbearer / other-ring / spec-item highlights with four styles, spec orb pulse.
+- **1.0.0** — initial release: Lightbearer / other-ring / spec-item highlights (outline, box, fill, underline, pulse, any combination), spec orb aura / outline / fill with pulse.
 
 ## License
 

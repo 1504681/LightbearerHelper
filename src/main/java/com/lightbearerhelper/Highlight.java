@@ -3,26 +3,70 @@ package com.lightbearerhelper;
 import java.awt.Color;
 
 /**
- * A resolved highlight for one item: how to draw it and in which colour.
+ * A resolved highlight for one item: which decorations to draw, in which colour, and whether
+ * the whole thing pulses.
  */
 public final class Highlight
 {
-	private final HighlightStyle style;
 	private final Color color;
+	private final boolean outline;
+	private final boolean box;
+	private final boolean fill;
+	private final int fillOpacityPercent;
+	private final boolean underline;
+	private final boolean pulse;
 
-	public Highlight(HighlightStyle style, Color color)
+	public Highlight(Color color, boolean outline, boolean box, boolean fill, int fillOpacityPercent,
+		boolean underline, boolean pulse)
 	{
-		this.style = style;
 		this.color = color;
-	}
-
-	public HighlightStyle getStyle()
-	{
-		return style;
+		this.outline = outline;
+		this.box = box;
+		this.fill = fill;
+		this.fillOpacityPercent = Math.max(0, Math.min(100, fillOpacityPercent));
+		this.underline = underline;
+		this.pulse = pulse;
 	}
 
 	public Color getColor()
 	{
 		return color;
+	}
+
+	public boolean isOutline()
+	{
+		return outline;
+	}
+
+	public boolean isBox()
+	{
+		return box;
+	}
+
+	public boolean isFill()
+	{
+		return fill;
+	}
+
+	public int getFillOpacityPercent()
+	{
+		return fillOpacityPercent;
+	}
+
+	public boolean isUnderline()
+	{
+		return underline;
+	}
+
+	public boolean isPulse()
+	{
+		return pulse;
+	}
+
+	/** Fill colour with the configured opacity applied on top of the colour's own alpha. */
+	public Color getFillColor()
+	{
+		int alpha = Math.round(color.getAlpha() * fillOpacityPercent / 100f);
+		return new Color(color.getRed(), color.getGreen(), color.getBlue(), Math.max(0, Math.min(255, alpha)));
 	}
 }

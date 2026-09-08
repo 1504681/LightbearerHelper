@@ -76,7 +76,7 @@ public class LightbearerHelperPlugin extends Plugin
 	private final Map<Integer, Integer> kindCache = new HashMap<>();
 
 	private volatile HighlightState.Mode mode = HighlightState.Mode.IDLE;
-	private volatile boolean orbPulseActive;
+	private volatile boolean orbHighlightActive;
 	private int wornRingId = -1;
 	private int wornWeaponId = -1;
 
@@ -106,7 +106,7 @@ public class LightbearerHelperPlugin extends Plugin
 		overlayManager.remove(specOrbOverlay);
 		clientThread.invoke(this::restoreOrbText);
 		mode = HighlightState.Mode.IDLE;
-		orbPulseActive = false;
+		orbHighlightActive = false;
 		wornRingId = -1;
 		wornWeaponId = -1;
 		kindCache.clear();
@@ -157,14 +157,14 @@ public class LightbearerHelperPlugin extends Plugin
 		else if (event.getGameState() == GameState.LOGIN_SCREEN || event.getGameState() == GameState.HOPPING)
 		{
 			mode = HighlightState.Mode.IDLE;
-			orbPulseActive = false;
+			orbHighlightActive = false;
 		}
 	}
 
 	@Subscribe
 	public void onBeforeRender(BeforeRender event)
 	{
-		if (orbPulseActive && config.tintOrbText())
+		if (orbHighlightActive && config.tintOrbText())
 		{
 			tintOrbText();
 		}
@@ -189,7 +189,7 @@ public class LightbearerHelperPlugin extends Plugin
 		if (client.getGameState() != GameState.LOGGED_IN)
 		{
 			mode = HighlightState.Mode.IDLE;
-			orbPulseActive = false;
+			orbHighlightActive = false;
 			return;
 		}
 
@@ -200,7 +200,7 @@ public class LightbearerHelperPlugin extends Plugin
 		wornWeaponId = slotItemId(equipment, EquipmentInventorySlot.WEAPON);
 
 		mode = HighlightState.resolve(specFull, isLightbearer(wornRingId), isListedRing(wornRingId));
-		orbPulseActive = mode == HighlightState.Mode.WANT_OTHER_RING && config.pulseOrb();
+		orbHighlightActive = mode == HighlightState.Mode.WANT_OTHER_RING && config.orbEnabled();
 	}
 
 	private static int slotItemId(ItemContainer container, EquipmentInventorySlot slot)
@@ -218,15 +218,25 @@ public class LightbearerHelperPlugin extends Plugin
 		return mode;
 	}
 
-	public boolean isOrbPulseActive()
+	public boolean isOrbHighlightActive()
 	{
-		return orbPulseActive;
+		return orbHighlightActive;
 	}
 
-	/** 0..1 how strongly the pulse colour should show right now. */
-	public float pulseIntensity()
+	/** 0..1 how strongly the orb decorations should show right now (1 when not pulsing). */
+	public float orbPulseFactor()
 	{
+		if (!config.orbPulse())
+		{
+			return 1f;
+		}
 		return config.orbPulseMode().intensity(System.currentTimeMillis(), config.orbPeriodMs());
+	}
+
+	/** 0..1 opacity multiplier for item highlights that have Pulse enabled. */
+	public float itemPulseFactor()
+	{
+		return config.itemPulseMode().intensity(System.currentTimeMillis(), config.itemPulsePeriodMs());
 	}
 
 	/**
@@ -245,13 +255,13 @@ public class LightbearerHelperPlugin extends Plugin
 					// the ring currently worn is the one to take off
 					if (config.highlightWornRing() && wornRingId != -1 && itemId == wornRingId)
 					{
-						return new Highlight(config.lightbearerStyle(), config.lightbearerColor());
+						return lightbearerHighlight();
 					}
 					return null;
 				}
 				if (isLightbearer(itemId))
 				{
-					return new Highlight(config.lightbearerStyle(), config.lightbearerColor());
+					return lightbearerHighlight();
 				}
 				return null;
 
@@ -260,18 +270,18 @@ public class LightbearerHelperPlugin extends Plugin
 				{
 					if (config.highlightWornRing() && wornRingId != -1 && itemId == wornRingId)
 					{
-						return new Highlight(config.ringStyle(), config.ringColor());
+						return ringHighlight();
 					}
 					return null;
 				}
 				if (isListedRing(itemId))
 				{
-					return new Highlight(config.ringStyle(), config.ringColor());
+					return ringHighlight();
 				}
 				if (config.highlightSpecItems() && isSpecItem(itemId)
 					&& !(config.specSkipIfWielded() && isSpecItem(wornWeaponId)))
 				{
-					return new Highlight(config.specItemStyle(), config.specItemColor());
+					return specItemHighlight();
 				}
 				return null;
 
@@ -279,6 +289,24 @@ public class LightbearerHelperPlugin extends Plugin
 			default:
 				return null;
 		}
+	}
+
+	private Highlight lightbearerHighlight()
+	{
+		return new Highlight(config.lightbearerColor(), config.lightbearerOutline(), config.lightbearerBox(),
+			config.lightbearerFill(), config.lightbearerFillOpacity(), config.lightbearerUnderline(), config.lightbearerPulse());
+	}
+
+	private Highlight ringHighlight()
+	{
+		return new Highlight(config.ringColor(), config.ringOutline(), config.ringBox(),
+			config.ringFill(), config.ringFillOpacity(), config.ringUnderline(), config.ringPulse());
+	}
+
+	private Highlight specItemHighlight()
+	{
+		return new Highlight(config.specItemColor(), config.specItemOutline(), config.specItemBox(),
+			config.specItemFill(), config.specItemFillOpacity(), config.specItemUnderline(), config.specItemPulse());
 	}
 
 	// ------------------------------------------------------------------ item classification
@@ -352,7 +380,7 @@ public class LightbearerHelperPlugin extends Plugin
 		{
 			originalOrbTextColor = text.getTextColor();
 		}
-		float intensity = pulseIntensity();
+		float intensity = orbPulseFactor();
 		Color from = new Color(originalOrbTextColor);
 		Color to = config.orbColor();
 		int r = lerp(from.getRed(), to.getRed(), intensity);

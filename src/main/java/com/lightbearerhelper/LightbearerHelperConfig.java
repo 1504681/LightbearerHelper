@@ -20,68 +20,168 @@ public interface LightbearerHelperConfig extends Config
 		+ "Dragon warhammer\nElder maul\nDragon dagger*\nAbyssal dagger*\nDragon halberd\nZaryte crossbow\n"
 		+ "Toxic blowpipe*\nEldritch nightmare staff\nVolatile nightmare staff";
 
+	/** Light blue shared by the Lightbearer and spec item highlights. */
+	Color LIGHT_BLUE = new Color(80, 200, 255, 255);
+
 	// ---------------------------------------------------------------- sections
+
+	@ConfigSection(
+		name = "General",
+		description = "Settings shared by all item highlights",
+		position = 0
+	)
+	String generalSection = "general";
 
 	@ConfigSection(
 		name = "Lightbearer",
 		description = "Highlight the Lightbearer while special attack is below 100%",
-		position = 0
+		position = 1
 	)
 	String lightbearerSection = "lightbearer";
 
 	@ConfigSection(
 		name = "Other rings",
 		description = "Rings to highlight once special attack is at 100% and the Lightbearer is still worn",
-		position = 1
+		position = 2
 	)
 	String ringsSection = "rings";
 
 	@ConfigSection(
 		name = "Spec items",
 		description = "Special attack weapons to highlight once special attack is at 100%",
-		position = 2
+		position = 3
 	)
 	String specItemsSection = "specItems";
 
 	@ConfigSection(
 		name = "Spec orb",
-		description = "Pulse the special attack orb colour once special attack is at 100%",
-		position = 3
+		description = "Decorate the special attack orb once special attack is at 100%",
+		position = 4
 	)
 	String orbSection = "orb";
 
-	// ---------------------------------------------------------------- lightbearer
+	// ---------------------------------------------------------------- general
+
+	@Range(min = 200, max = 3000)
+	@Units(Units.MILLISECONDS)
+	@ConfigItem(
+		keyName = "itemPulsePeriodMs",
+		name = "Item pulse period",
+		description = "Time for one full pulse of an item highlight that has Pulse enabled",
+		position = 0,
+		section = generalSection
+	)
+	default int itemPulsePeriodMs()
+	{
+		return 800;
+	}
 
 	@ConfigItem(
-		keyName = "lightbearerStyle",
-		name = "Highlight style",
-		description = "How the Lightbearer is highlighted in your inventory while spec is regenerating",
-		position = 0,
-		section = lightbearerSection
+		keyName = "itemPulseMode",
+		name = "Item pulse mode",
+		description = "Smooth fade or hard blink for pulsing item highlights",
+		position = 1,
+		section = generalSection
 	)
-	default HighlightStyle lightbearerStyle()
+	default OrbPulseMode itemPulseMode()
 	{
-		return HighlightStyle.OUTLINE;
+		return OrbPulseMode.SMOOTH;
 	}
+
+	// ---------------------------------------------------------------- lightbearer
 
 	@Alpha
 	@ConfigItem(
 		keyName = "lightbearerColor",
-		name = "Highlight colour",
+		name = "Colour",
 		description = "Colour used for the Lightbearer highlight",
-		position = 1,
+		position = 0,
 		section = lightbearerSection
 	)
 	default Color lightbearerColor()
 	{
-		return new Color(0, 255, 0, 255);
+		return LIGHT_BLUE;
+	}
+
+	@ConfigItem(
+		keyName = "lightbearerOutline",
+		name = "Outline",
+		description = "Draw a coloured outline around the item sprite",
+		position = 1,
+		section = lightbearerSection
+	)
+	default boolean lightbearerOutline()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "lightbearerBox",
+		name = "Box",
+		description = "Draw a rectangle around the inventory slot",
+		position = 2,
+		section = lightbearerSection
+	)
+	default boolean lightbearerBox()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "lightbearerFill",
+		name = "Fill",
+		description = "Fill the inventory slot with a translucent colour",
+		position = 3,
+		section = lightbearerSection
+	)
+	default boolean lightbearerFill()
+	{
+		return false;
+	}
+
+	@Range(min = 0, max = 100)
+	@Units(Units.PERCENT)
+	@ConfigItem(
+		keyName = "lightbearerFillOpacity",
+		name = "Fill opacity",
+		description = "Opacity of the slot fill",
+		position = 4,
+		section = lightbearerSection
+	)
+	default int lightbearerFillOpacity()
+	{
+		return 30;
+	}
+
+	@ConfigItem(
+		keyName = "lightbearerUnderline",
+		name = "Underline",
+		description = "Draw a coloured bar under the inventory slot",
+		position = 5,
+		section = lightbearerSection
+	)
+	default boolean lightbearerUnderline()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "lightbearerPulse",
+		name = "Pulse",
+		description = "Pulse the highlight between the colour and transparent (see General for the speed)",
+		position = 6,
+		section = lightbearerSection
+	)
+	default boolean lightbearerPulse()
+	{
+		return false;
 	}
 
 	@ConfigItem(
 		keyName = "highlightWornRing",
 		name = "Mark worn ring to swap",
 		description = "Also highlight the ring in the worn equipment tab that should be swapped out",
-		position = 2,
+		position = 7,
 		section = lightbearerSection
 	)
 	default boolean highlightWornRing()
@@ -103,29 +203,91 @@ public interface LightbearerHelperConfig extends Config
 		return DEFAULT_RINGS;
 	}
 
-	@ConfigItem(
-		keyName = "ringStyle",
-		name = "Highlight style",
-		description = "How the other rings are highlighted in your inventory when spec is full",
-		position = 1,
-		section = ringsSection
-	)
-	default HighlightStyle ringStyle()
-	{
-		return HighlightStyle.OUTLINE;
-	}
-
 	@Alpha
 	@ConfigItem(
 		keyName = "ringColor",
-		name = "Highlight colour",
+		name = "Colour",
 		description = "Colour used for the other-ring highlight",
-		position = 2,
+		position = 1,
 		section = ringsSection
 	)
 	default Color ringColor()
 	{
 		return new Color(0, 255, 255, 255);
+	}
+
+	@ConfigItem(
+		keyName = "ringOutline",
+		name = "Outline",
+		description = "Draw a coloured outline around the item sprite",
+		position = 2,
+		section = ringsSection
+	)
+	default boolean ringOutline()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "ringBox",
+		name = "Box",
+		description = "Draw a rectangle around the inventory slot",
+		position = 3,
+		section = ringsSection
+	)
+	default boolean ringBox()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "ringFill",
+		name = "Fill",
+		description = "Fill the inventory slot with a translucent colour",
+		position = 4,
+		section = ringsSection
+	)
+	default boolean ringFill()
+	{
+		return false;
+	}
+
+	@Range(min = 0, max = 100)
+	@Units(Units.PERCENT)
+	@ConfigItem(
+		keyName = "ringFillOpacity",
+		name = "Fill opacity",
+		description = "Opacity of the slot fill",
+		position = 5,
+		section = ringsSection
+	)
+	default int ringFillOpacity()
+	{
+		return 30;
+	}
+
+	@ConfigItem(
+		keyName = "ringUnderline",
+		name = "Underline",
+		description = "Draw a coloured bar under the inventory slot",
+		position = 6,
+		section = ringsSection
+	)
+	default boolean ringUnderline()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "ringPulse",
+		name = "Pulse",
+		description = "Pulse the highlight between the colour and transparent (see General for the speed)",
+		position = 7,
+		section = ringsSection
+	)
+	default boolean ringPulse()
+	{
+		return false;
 	}
 
 	// ---------------------------------------------------------------- spec items
@@ -166,41 +328,103 @@ public interface LightbearerHelperConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(
-		keyName = "specItemStyle",
-		name = "Highlight style",
-		description = "How spec items are highlighted",
-		position = 3,
-		section = specItemsSection
-	)
-	default HighlightStyle specItemStyle()
-	{
-		return HighlightStyle.BOX;
-	}
-
 	@Alpha
 	@ConfigItem(
 		keyName = "specItemColor",
-		name = "Highlight colour",
+		name = "Colour",
 		description = "Colour used for the spec item highlight",
-		position = 4,
+		position = 3,
 		section = specItemsSection
 	)
 	default Color specItemColor()
 	{
-		return new Color(255, 165, 0, 255);
+		return LIGHT_BLUE;
+	}
+
+	@ConfigItem(
+		keyName = "specItemOutline",
+		name = "Outline",
+		description = "Draw a coloured outline around the item sprite",
+		position = 4,
+		section = specItemsSection
+	)
+	default boolean specItemOutline()
+	{
+		return true;
+	}
+
+	@ConfigItem(
+		keyName = "specItemBox",
+		name = "Box",
+		description = "Draw a rectangle around the inventory slot",
+		position = 5,
+		section = specItemsSection
+	)
+	default boolean specItemBox()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "specItemFill",
+		name = "Fill",
+		description = "Fill the inventory slot with a translucent colour",
+		position = 6,
+		section = specItemsSection
+	)
+	default boolean specItemFill()
+	{
+		return false;
+	}
+
+	@Range(min = 0, max = 100)
+	@Units(Units.PERCENT)
+	@ConfigItem(
+		keyName = "specItemFillOpacity",
+		name = "Fill opacity",
+		description = "Opacity of the slot fill",
+		position = 7,
+		section = specItemsSection
+	)
+	default int specItemFillOpacity()
+	{
+		return 30;
+	}
+
+	@ConfigItem(
+		keyName = "specItemUnderline",
+		name = "Underline",
+		description = "Draw a coloured bar under the inventory slot",
+		position = 8,
+		section = specItemsSection
+	)
+	default boolean specItemUnderline()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "specItemPulse",
+		name = "Pulse",
+		description = "Pulse the highlight between the colour and transparent (see General for the speed)",
+		position = 9,
+		section = specItemsSection
+	)
+	default boolean specItemPulse()
+	{
+		return false;
 	}
 
 	// ---------------------------------------------------------------- spec orb
 
 	@ConfigItem(
-		keyName = "pulseOrb",
-		name = "Pulse spec orb",
-		description = "Oscillate the special attack orb between its normal colour and the pulse colour when spec is full and no listed ring is worn",
+		keyName = "orbEnabled",
+		name = "Highlight spec orb",
+		description = "Decorate the special attack orb when spec is full and no listed ring is worn",
 		position = 0,
 		section = orbSection
 	)
-	default boolean pulseOrb()
+	default boolean orbEnabled()
 	{
 		return true;
 	}
@@ -208,14 +432,89 @@ public interface LightbearerHelperConfig extends Config
 	@Alpha
 	@ConfigItem(
 		keyName = "orbColor",
-		name = "Pulse colour",
-		description = "Colour the orb pulses towards. The alpha controls how strong the tint gets at its peak",
+		name = "Colour",
+		description = "Colour of the aura, outline and fill. The alpha sets the peak strength",
 		position = 1,
 		section = orbSection
 	)
 	default Color orbColor()
 	{
-		return new Color(255, 0, 0, 170);
+		return new Color(255, 0, 0, 200);
+	}
+
+	@ConfigItem(
+		keyName = "orbAura",
+		name = "Aura",
+		description = "Glowing halo around the outside of the orb",
+		position = 2,
+		section = orbSection
+	)
+	default boolean orbAura()
+	{
+		return true;
+	}
+
+	@Range(min = 2, max = 30)
+	@ConfigItem(
+		keyName = "orbAuraSize",
+		name = "Aura size",
+		description = "How far the aura extends beyond the orb edge, in pixels",
+		position = 3,
+		section = orbSection
+	)
+	default int orbAuraSize()
+	{
+		return 8;
+	}
+
+	@ConfigItem(
+		keyName = "orbOutline",
+		name = "Outline",
+		description = "Ring drawn along the edge of the orb",
+		position = 4,
+		section = orbSection
+	)
+	default boolean orbOutline()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "orbFill",
+		name = "Fill",
+		description = "Tint the inside of the orb",
+		position = 5,
+		section = orbSection
+	)
+	default boolean orbFill()
+	{
+		return false;
+	}
+
+	@Range(min = 0, max = 100)
+	@Units(Units.PERCENT)
+	@ConfigItem(
+		keyName = "orbFillOpacity",
+		name = "Fill opacity",
+		description = "Opacity of the orb tint",
+		position = 6,
+		section = orbSection
+	)
+	default int orbFillOpacity()
+	{
+		return 50;
+	}
+
+	@ConfigItem(
+		keyName = "orbPulse",
+		name = "Pulse",
+		description = "Oscillate the orb decorations between the normal orb and the colour",
+		position = 7,
+		section = orbSection
+	)
+	default boolean orbPulse()
+	{
+		return true;
 	}
 
 	@Range(min = 200, max = 3000)
@@ -224,7 +523,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbPeriodMs",
 		name = "Pulse period",
 		description = "Time for one full pulse (normal -> colour -> normal)",
-		position = 2,
+		position = 8,
 		section = orbSection
 	)
 	default int orbPeriodMs()
@@ -236,7 +535,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbPulseMode",
 		name = "Pulse mode",
 		description = "Smooth fade or hard blink",
-		position = 3,
+		position = 9,
 		section = orbSection
 	)
 	default OrbPulseMode orbPulseMode()
@@ -247,8 +546,8 @@ public interface LightbearerHelperConfig extends Config
 	@ConfigItem(
 		keyName = "tintOrbText",
 		name = "Tint orb text",
-		description = "Also fade the spec percentage text towards the pulse colour",
-		position = 4,
+		description = "Also fade the spec percentage text towards the colour",
+		position = 10,
 		section = orbSection
 	)
 	default boolean tintOrbText()

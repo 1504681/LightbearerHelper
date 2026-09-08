@@ -1,7 +1,9 @@
 package com.lightbearerhelper;
 
+import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.Stroke;
@@ -18,12 +20,12 @@ import net.runelite.client.ui.overlay.WidgetItemOverlay;
 
 /**
  * Draws the Lightbearer / other ring / spec item highlights on inventory and worn-equipment items.
+ * Each highlight is any combination of outline, box, fill and underline, optionally pulsing.
  */
 public class ItemHighlightOverlay extends WidgetItemOverlay
 {
 	private static final Stroke BOX_STROKE = new BasicStroke(2f);
 	private static final int UNDERLINE_HEIGHT = 2;
-	private static final int FILL_ALPHA = 90;
 
 	private final ItemManager itemManager;
 	private final LightbearerHelperPlugin plugin;
@@ -51,45 +53,47 @@ public class ItemHighlightOverlay extends WidgetItemOverlay
 		{
 			return;
 		}
-		Color color = highlight.getColor();
-		switch (highlight.getStyle())
+
+		float factor = highlight.isPulse() ? plugin.itemPulseFactor() : 1f;
+		if (factor <= 0f)
 		{
-			case OUTLINE:
-			{
-				BufferedImage outline = getOutline(itemId, widgetItem.getQuantity(), color);
-				if (outline != null)
-				{
-					graphics.drawImage(outline, bounds.x, bounds.y, null);
-				}
-				break;
-			}
-			case BOX:
-			{
-				Stroke old = graphics.getStroke();
-				graphics.setStroke(BOX_STROKE);
-				graphics.setColor(color);
-				graphics.drawRect(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1);
-				graphics.setStroke(old);
-				break;
-			}
-			case FILL:
-			{
-				int alpha = Math.min(color.getAlpha(), FILL_ALPHA);
-				graphics.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha));
-				graphics.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
-				graphics.setColor(color);
-				graphics.drawRect(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1);
-				break;
-			}
-			case UNDERLINE:
-			{
-				graphics.setColor(color);
-				graphics.fillRect(bounds.x, bounds.y + bounds.height, bounds.width, UNDERLINE_HEIGHT);
-				break;
-			}
-			default:
-				break;
+			return;
 		}
+		Composite oldComposite = graphics.getComposite();
+		if (factor < 1f)
+		{
+			graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, factor));
+		}
+
+		Color color = highlight.getColor();
+		if (highlight.isFill())
+		{
+			graphics.setColor(highlight.getFillColor());
+			graphics.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+		}
+		if (highlight.isOutline())
+		{
+			BufferedImage outline = getOutline(itemId, widgetItem.getQuantity(), color);
+			if (outline != null)
+			{
+				graphics.drawImage(outline, bounds.x, bounds.y, null);
+			}
+		}
+		if (highlight.isBox())
+		{
+			Stroke old = graphics.getStroke();
+			graphics.setStroke(BOX_STROKE);
+			graphics.setColor(color);
+			graphics.drawRect(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1);
+			graphics.setStroke(old);
+		}
+		if (highlight.isUnderline())
+		{
+			graphics.setColor(color);
+			graphics.fillRect(bounds.x, bounds.y + bounds.height, bounds.width, UNDERLINE_HEIGHT);
+		}
+
+		graphics.setComposite(oldComposite);
 	}
 
 	void invalidateCache()
