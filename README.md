@@ -30,6 +30,8 @@ On Windows use `.\gradlew.bat run`. That starts a normal RuneLite client in deve
 
 ## Changelog
 
+1.0.1: fill tints the item instead of the whole slot. The orb only lights up while a listed spec item is carried, on by default.
+
 1.0.0: first release.
 
 ## License
