@@ -2,7 +2,7 @@
 
 RuneLite plugin for the Lightbearer ring swap. It tells you when to put the Lightbearer on, when to take it off again, and makes it obvious when your spec is ready.
 
-While spec is below 100% and you aren't wearing the Lightbearer, it gets highlighted in your inventory. If you want, the ring you're currently wearing gets marked in the equipment tab too so you know what's coming off.
+While spec is below 100% and you aren't wearing the Lightbearer, it gets highlighted in your inventory.
 
 Once spec hits 100% the rings you've listed (Ultor, Bellator, Magus, Venator and so on) light up instead, until you equip one. At the same time the spec orb gets a glowing aura, and if you turn it on, your spec weapons get highlighted as well. When a listed ring is on (and a spec weapon, if you're highlighting those) it all goes quiet until spec drops again.
 
