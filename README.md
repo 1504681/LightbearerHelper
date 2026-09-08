@@ -74,7 +74,7 @@ From an IDE: run the `LightbearerHelperLauncher` class with the `-ea` VM flag.
 
 ## Plugin Hub
 
-The repo is private while in development; the Plugin Hub builds straight from GitHub, so it has to be made public before submitting (see `~/homelab/runbooks/runelite-plugin.md`).
+Submitted to the RuneLite Plugin Hub as `lightbearer-helper`.
 
 ## Changelog
 

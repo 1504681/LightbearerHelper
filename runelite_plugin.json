@@ -1,8 +1,21 @@
 {
-  "plugins": ["com.lightbearerhelper.LightbearerHelperPlugin"],
+  "plugins": [
+    "com.lightbearerhelper.LightbearerHelperPlugin"
+  ],
   "displayName": "Lightbearer Helper",
   "author": "1504681",
-  "description": "Highlight the Lightbearer while special attack regenerates, then highlight your other rings and spec weapons and pulse the spec orb once it is full",
-  "tags": ["lightbearer", "ring", "spec", "special attack", "swap", "highlight", "ultor", "bellator", "magus", "venator"],
+  "description": "Highlights when to swap the Lightbearer for your other rings and pulses the spec orb when spec is ready",
+  "tags": [
+    "lightbearer",
+    "ring",
+    "spec",
+    "special attack",
+    "swap",
+    "highlight",
+    "ultor",
+    "bellator",
+    "magus",
+    "venator"
+  ],
   "version": "1.0.0"
 }

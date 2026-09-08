@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 
 @PluginDescriptor(
 	name = "Lightbearer Helper",
-	description = "Highlight the Lightbearer while spec regenerates, then your other rings, spec weapons and the spec orb once it is full",
+	description = "Highlights when to swap the Lightbearer for your other rings and pulses the spec orb when spec is ready",
 	tags = {"lightbearer", "ring", "spec", "special attack", "swap", "highlight", "ultor", "bellator", "magus", "venator"}
 )
 public class LightbearerHelperPlugin extends Plugin
