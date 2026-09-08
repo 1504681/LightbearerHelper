@@ -193,14 +193,20 @@ public class LightbearerHelperPlugin extends Plugin
 			return;
 		}
 
-		boolean specFull = HighlightState.isSpecFull(client.getVarpValue(VarPlayer.SPECIAL_ATTACK_PERCENT));
+		int specVarp = client.getVarpValue(VarPlayer.SPECIAL_ATTACK_PERCENT);
+		boolean specFull = HighlightState.isSpecFull(specVarp);
 
 		ItemContainer equipment = client.getItemContainer(InventoryID.EQUIPMENT);
 		wornRingId = slotItemId(equipment, EquipmentInventorySlot.RING);
 		wornWeaponId = slotItemId(equipment, EquipmentInventorySlot.WEAPON);
 
-		mode = HighlightState.resolve(specFull, isLightbearer(wornRingId), isListedRing(wornRingId));
-		orbHighlightActive = mode == HighlightState.Mode.WANT_OTHER_RING && config.orbEnabled();
+		boolean wornIsListedRing = isListedRing(wornRingId);
+		mode = HighlightState.resolve(specFull, isLightbearer(wornRingId), wornIsListedRing);
+
+		// the swap counts as done once the ring is on and, if spec items are being highlighted, a spec weapon is wielded
+		boolean swapDone = wornIsListedRing && (!config.highlightSpecItems() || isSpecItem(wornWeaponId));
+		orbHighlightActive = config.orbEnabled()
+			&& HighlightState.orbActive(specVarp, config.orbThresholdPercent(), config.orbAlways(), swapDone);
 	}
 
 	private static int slotItemId(ItemContainer container, EquipmentInventorySlot slot)
@@ -293,19 +299,19 @@ public class LightbearerHelperPlugin extends Plugin
 
 	private Highlight lightbearerHighlight()
 	{
-		return new Highlight(config.lightbearerColor(), config.lightbearerOutline(), config.lightbearerBox(),
+		return new Highlight(config.lightbearerColor(), config.lightbearerOutline(),
 			config.lightbearerFill(), config.lightbearerFillOpacity(), config.lightbearerUnderline(), config.lightbearerPulse());
 	}
 
 	private Highlight ringHighlight()
 	{
-		return new Highlight(config.ringColor(), config.ringOutline(), config.ringBox(),
+		return new Highlight(config.ringColor(), config.ringOutline(),
 			config.ringFill(), config.ringFillOpacity(), config.ringUnderline(), config.ringPulse());
 	}
 
 	private Highlight specItemHighlight()
 	{
-		return new Highlight(config.specItemColor(), config.specItemOutline(), config.specItemBox(),
+		return new Highlight(config.specItemColor(), config.specItemOutline(),
 			config.specItemFill(), config.specItemFillOpacity(), config.specItemUnderline(), config.specItemPulse());
 	}
 

@@ -73,7 +73,7 @@ public interface LightbearerHelperConfig extends Config
 	)
 	default int itemPulsePeriodMs()
 	{
-		return 800;
+		return 1200;
 	}
 
 	@ConfigItem(
@@ -115,23 +115,12 @@ public interface LightbearerHelperConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(
-		keyName = "lightbearerBox",
-		name = "Box",
-		description = "Draw a rectangle around the inventory slot",
-		position = 2,
-		section = lightbearerSection
-	)
-	default boolean lightbearerBox()
-	{
-		return false;
-	}
 
 	@ConfigItem(
 		keyName = "lightbearerFill",
 		name = "Fill",
 		description = "Fill the inventory slot with a translucent colour",
-		position = 3,
+		position = 2,
 		section = lightbearerSection
 	)
 	default boolean lightbearerFill()
@@ -145,7 +134,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "lightbearerFillOpacity",
 		name = "Fill opacity",
 		description = "Opacity of the slot fill",
-		position = 4,
+		position = 3,
 		section = lightbearerSection
 	)
 	default int lightbearerFillOpacity()
@@ -157,7 +146,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "lightbearerUnderline",
 		name = "Underline",
 		description = "Draw a coloured bar under the inventory slot",
-		position = 5,
+		position = 4,
 		section = lightbearerSection
 	)
 	default boolean lightbearerUnderline()
@@ -169,7 +158,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "lightbearerPulse",
 		name = "Pulse",
 		description = "Pulse the highlight between the colour and transparent (see General for the speed)",
-		position = 6,
+		position = 5,
 		section = lightbearerSection
 	)
 	default boolean lightbearerPulse()
@@ -181,7 +170,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "highlightWornRing",
 		name = "Mark worn ring to swap",
 		description = "Also highlight the ring in the worn equipment tab that should be swapped out",
-		position = 7,
+		position = 6,
 		section = lightbearerSection
 	)
 	default boolean highlightWornRing()
@@ -228,23 +217,12 @@ public interface LightbearerHelperConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(
-		keyName = "ringBox",
-		name = "Box",
-		description = "Draw a rectangle around the inventory slot",
-		position = 3,
-		section = ringsSection
-	)
-	default boolean ringBox()
-	{
-		return false;
-	}
 
 	@ConfigItem(
 		keyName = "ringFill",
 		name = "Fill",
 		description = "Fill the inventory slot with a translucent colour",
-		position = 4,
+		position = 3,
 		section = ringsSection
 	)
 	default boolean ringFill()
@@ -258,7 +236,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "ringFillOpacity",
 		name = "Fill opacity",
 		description = "Opacity of the slot fill",
-		position = 5,
+		position = 4,
 		section = ringsSection
 	)
 	default int ringFillOpacity()
@@ -270,7 +248,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "ringUnderline",
 		name = "Underline",
 		description = "Draw a coloured bar under the inventory slot",
-		position = 6,
+		position = 5,
 		section = ringsSection
 	)
 	default boolean ringUnderline()
@@ -282,7 +260,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "ringPulse",
 		name = "Pulse",
 		description = "Pulse the highlight between the colour and transparent (see General for the speed)",
-		position = 7,
+		position = 6,
 		section = ringsSection
 	)
 	default boolean ringPulse()
@@ -353,23 +331,12 @@ public interface LightbearerHelperConfig extends Config
 		return true;
 	}
 
-	@ConfigItem(
-		keyName = "specItemBox",
-		name = "Box",
-		description = "Draw a rectangle around the inventory slot",
-		position = 5,
-		section = specItemsSection
-	)
-	default boolean specItemBox()
-	{
-		return false;
-	}
 
 	@ConfigItem(
 		keyName = "specItemFill",
 		name = "Fill",
 		description = "Fill the inventory slot with a translucent colour",
-		position = 6,
+		position = 5,
 		section = specItemsSection
 	)
 	default boolean specItemFill()
@@ -383,7 +350,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "specItemFillOpacity",
 		name = "Fill opacity",
 		description = "Opacity of the slot fill",
-		position = 7,
+		position = 6,
 		section = specItemsSection
 	)
 	default int specItemFillOpacity()
@@ -395,7 +362,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "specItemUnderline",
 		name = "Underline",
 		description = "Draw a coloured bar under the inventory slot",
-		position = 8,
+		position = 7,
 		section = specItemsSection
 	)
 	default boolean specItemUnderline()
@@ -407,7 +374,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "specItemPulse",
 		name = "Pulse",
 		description = "Pulse the highlight between the colour and transparent (see General for the speed)",
-		position = 9,
+		position = 8,
 		section = specItemsSection
 	)
 	default boolean specItemPulse()
@@ -420,7 +387,7 @@ public interface LightbearerHelperConfig extends Config
 	@ConfigItem(
 		keyName = "orbEnabled",
 		name = "Highlight spec orb",
-		description = "Decorate the special attack orb when spec is full and no listed ring is worn",
+		description = "Decorate the special attack orb once spec reaches the threshold below",
 		position = 0,
 		section = orbSection
 	)
@@ -429,12 +396,38 @@ public interface LightbearerHelperConfig extends Config
 		return true;
 	}
 
+	@Range(min = 1, max = 100)
+	@Units(Units.PERCENT)
+	@ConfigItem(
+		keyName = "orbThresholdPercent",
+		name = "Show from",
+		description = "Special attack energy at which the orb highlight starts",
+		position = 1,
+		section = orbSection
+	)
+	default int orbThresholdPercent()
+	{
+		return 100;
+	}
+
+	@ConfigItem(
+		keyName = "orbAlways",
+		name = "Keep showing after swap",
+		description = "Keep the orb highlight going even once a listed ring (and, if spec items are enabled, a spec weapon) is equipped",
+		position = 2,
+		section = orbSection
+	)
+	default boolean orbAlways()
+	{
+		return false;
+	}
+
 	@Alpha
 	@ConfigItem(
 		keyName = "orbColor",
 		name = "Colour",
 		description = "Colour of the aura, outline and fill. The alpha sets the peak strength",
-		position = 1,
+		position = 3,
 		section = orbSection
 	)
 	default Color orbColor()
@@ -446,7 +439,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbAura",
 		name = "Aura",
 		description = "Glowing halo around the outside of the orb",
-		position = 2,
+		position = 4,
 		section = orbSection
 	)
 	default boolean orbAura()
@@ -459,7 +452,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbAuraSize",
 		name = "Aura size",
 		description = "How far the aura extends beyond the orb edge, in pixels",
-		position = 3,
+		position = 5,
 		section = orbSection
 	)
 	default int orbAuraSize()
@@ -471,7 +464,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbOutline",
 		name = "Outline",
 		description = "Ring drawn along the edge of the orb",
-		position = 4,
+		position = 6,
 		section = orbSection
 	)
 	default boolean orbOutline()
@@ -483,7 +476,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbFill",
 		name = "Fill",
 		description = "Tint the inside of the orb",
-		position = 5,
+		position = 7,
 		section = orbSection
 	)
 	default boolean orbFill()
@@ -497,7 +490,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbFillOpacity",
 		name = "Fill opacity",
 		description = "Opacity of the orb tint",
-		position = 6,
+		position = 8,
 		section = orbSection
 	)
 	default int orbFillOpacity()
@@ -509,7 +502,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbPulse",
 		name = "Pulse",
 		description = "Oscillate the orb decorations between the normal orb and the colour",
-		position = 7,
+		position = 9,
 		section = orbSection
 	)
 	default boolean orbPulse()
@@ -523,19 +516,19 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbPeriodMs",
 		name = "Pulse period",
 		description = "Time for one full pulse (normal -> colour -> normal)",
-		position = 8,
+		position = 10,
 		section = orbSection
 	)
 	default int orbPeriodMs()
 	{
-		return 800;
+		return 1200;
 	}
 
 	@ConfigItem(
 		keyName = "orbPulseMode",
 		name = "Pulse mode",
 		description = "Smooth fade or hard blink",
-		position = 9,
+		position = 11,
 		section = orbSection
 	)
 	default OrbPulseMode orbPulseMode()
@@ -547,7 +540,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "tintOrbText",
 		name = "Tint orb text",
 		description = "Also fade the spec percentage text towards the colour",
-		position = 10,
+		position = 12,
 		section = orbSection
 	)
 	default boolean tintOrbText()

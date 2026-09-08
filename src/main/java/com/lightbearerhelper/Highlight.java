@@ -3,25 +3,23 @@ package com.lightbearerhelper;
 import java.awt.Color;
 
 /**
- * A resolved highlight for one item: which decorations to draw, in which colour, and whether
+ * A resolved highlight for one item: which of outline / fill / underline to draw, in which colour, and whether
  * the whole thing pulses.
  */
 public final class Highlight
 {
 	private final Color color;
 	private final boolean outline;
-	private final boolean box;
 	private final boolean fill;
 	private final int fillOpacityPercent;
 	private final boolean underline;
 	private final boolean pulse;
 
-	public Highlight(Color color, boolean outline, boolean box, boolean fill, int fillOpacityPercent,
+	public Highlight(Color color, boolean outline, boolean fill, int fillOpacityPercent,
 		boolean underline, boolean pulse)
 	{
 		this.color = color;
 		this.outline = outline;
-		this.box = box;
 		this.fill = fill;
 		this.fillOpacityPercent = Math.max(0, Math.min(100, fillOpacityPercent));
 		this.underline = underline;
@@ -36,11 +34,6 @@ public final class Highlight
 	public boolean isOutline()
 	{
 		return outline;
-	}
-
-	public boolean isBox()
-	{
-		return box;
 	}
 
 	public boolean isFill()

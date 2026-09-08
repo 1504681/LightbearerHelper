@@ -1,12 +1,10 @@
 package com.lightbearerhelper;
 
 import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.Stroke;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,11 +18,10 @@ import net.runelite.client.ui.overlay.WidgetItemOverlay;
 
 /**
  * Draws the Lightbearer / other ring / spec item highlights on inventory and worn-equipment items.
- * Each highlight is any combination of outline, box, fill and underline, optionally pulsing.
+ * Each highlight is any combination of outline, fill and underline, optionally pulsing.
  */
 public class ItemHighlightOverlay extends WidgetItemOverlay
 {
-	private static final Stroke BOX_STROKE = new BasicStroke(2f);
 	private static final int UNDERLINE_HEIGHT = 2;
 
 	private final ItemManager itemManager;
@@ -78,14 +75,6 @@ public class ItemHighlightOverlay extends WidgetItemOverlay
 			{
 				graphics.drawImage(outline, bounds.x, bounds.y, null);
 			}
-		}
-		if (highlight.isBox())
-		{
-			Stroke old = graphics.getStroke();
-			graphics.setStroke(BOX_STROKE);
-			graphics.setColor(color);
-			graphics.drawRect(bounds.x, bounds.y, bounds.width - 1, bounds.height - 1);
-			graphics.setStroke(old);
 		}
 		if (highlight.isUnderline())
 		{

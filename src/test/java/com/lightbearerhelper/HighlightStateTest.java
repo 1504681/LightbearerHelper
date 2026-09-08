@@ -49,4 +49,29 @@ public class HighlightStateTest
 	{
 		assertEquals(IDLE, HighlightState.resolve(true, false, true));
 	}
+
+	@Test
+	public void orbStartsAtThreshold()
+	{
+		assertFalse(HighlightState.orbActive(999, 100, false, false));
+		assertTrue(HighlightState.orbActive(1000, 100, false, false));
+		assertFalse(HighlightState.orbActive(499, 50, false, false));
+		assertTrue(HighlightState.orbActive(500, 50, false, false));
+	}
+
+	@Test
+	public void orbStopsAfterSwapUnlessKeptOn()
+	{
+		assertFalse(HighlightState.orbActive(1000, 100, false, true));
+		assertTrue(HighlightState.orbActive(1000, 100, true, true));
+		// below threshold never shows, even with keep-on
+		assertFalse(HighlightState.orbActive(0, 100, true, true));
+	}
+
+	@Test
+	public void orbThresholdIsClamped()
+	{
+		assertTrue(HighlightState.orbActive(10, 0, false, false));
+		assertFalse(HighlightState.orbActive(999, 250, false, false));
+	}
 }

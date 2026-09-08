@@ -29,6 +29,24 @@ public final class HighlightState
 	}
 
 	/**
+	 * Whether the spec orb decoration should be showing.
+	 *
+	 * @param specialAttackPercentVarp raw varp value (0..1000)
+	 * @param thresholdPercent         energy percentage the highlight starts at (1..100)
+	 * @param keepAfterSwap            keep showing even once the swap is done
+	 * @param swapDone                 a listed ring (and, if required, a spec weapon) is equipped
+	 */
+	public static boolean orbActive(int specialAttackPercentVarp, int thresholdPercent, boolean keepAfterSwap, boolean swapDone)
+	{
+		int threshold = Math.max(1, Math.min(100, thresholdPercent)) * 10;
+		if (specialAttackPercentVarp < threshold)
+		{
+			return false;
+		}
+		return keepAfterSwap || !swapDone;
+	}
+
+	/**
 	 * @param specFull           special attack energy is at 100%
 	 * @param wornIsLightbearer  the ring slot holds a Lightbearer
 	 * @param wornIsListedRing   the ring slot holds one of the configured "other rings"
