@@ -20,7 +20,7 @@ public interface LightbearerHelperConfig extends Config
 		+ "Dragon warhammer\nElder maul\nDragon dagger*\nAbyssal dagger*\nDragon halberd\nZaryte crossbow\n"
 		+ "Toxic blowpipe*\nEldritch nightmare staff\nVolatile nightmare staff";
 
-	Color LIGHT_BLUE = new Color(80, 200, 255, 255);
+	Color DEFAULT_COLOR = new Color(0xB3, 0xA1, 0x6C, 0xC8);
 
 	@ConfigSection(
 		name = "General",
@@ -68,7 +68,7 @@ public interface LightbearerHelperConfig extends Config
 	)
 	default int itemPulsePeriodMs()
 	{
-		return 1200;
+		return 2000;
 	}
 
 	@ConfigItem(
@@ -83,6 +83,20 @@ public interface LightbearerHelperConfig extends Config
 		return OrbPulseMode.SMOOTH;
 	}
 
+	@Range(min = 1, max = 100)
+	@Units(Units.PERCENT)
+	@ConfigItem(
+		keyName = "specReadyPercent",
+		name = "Spec ready at",
+		description = "Special attack energy that counts as ready for the spec orb and spec item highlights. The ring swap itself always waits for 100%",
+		position = 2,
+		section = generalSection
+	)
+	default int specReadyPercent()
+	{
+		return 100;
+	}
+
 	@Alpha
 	@ConfigItem(
 		keyName = "lightbearerColor",
@@ -93,7 +107,7 @@ public interface LightbearerHelperConfig extends Config
 	)
 	default Color lightbearerColor()
 	{
-		return LIGHT_BLUE;
+		return DEFAULT_COLOR;
 	}
 
 	@ConfigItem(
@@ -192,7 +206,7 @@ public interface LightbearerHelperConfig extends Config
 	)
 	default Color ringColor()
 	{
-		return new Color(0, 255, 255, 255);
+		return DEFAULT_COLOR;
 	}
 
 	@ConfigItem(
@@ -270,10 +284,22 @@ public interface LightbearerHelperConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "specItemsAlways",
+		name = "Even without the ring swap",
+		description = "Highlight spec items whenever spec is ready, not only while waiting to swap rings. Turn off to tie them to the Lightbearer swap",
+		position = 1,
+		section = specItemsSection
+	)
+	default boolean specItemsAlways()
+	{
+		return true;
+	}
+
+	@ConfigItem(
 		keyName = "specItemList",
 		name = "Spec items",
 		description = "Special attack items to highlight when spec is full. One per line, * wildcards allowed, e.g. Dragon dagger*",
-		position = 1,
+		position = 2,
 		section = specItemsSection
 	)
 	default String specItemList()
@@ -285,7 +311,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "specSkipIfWielded",
 		name = "Skip when spec weapon wielded",
 		description = "Don't highlight spec items in the inventory while a listed spec weapon is already equipped",
-		position = 2,
+		position = 3,
 		section = specItemsSection
 	)
 	default boolean specSkipIfWielded()
@@ -298,19 +324,19 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "specItemColor",
 		name = "Colour",
 		description = "Colour used for the spec item highlight",
-		position = 3,
+		position = 4,
 		section = specItemsSection
 	)
 	default Color specItemColor()
 	{
-		return LIGHT_BLUE;
+		return DEFAULT_COLOR;
 	}
 
 	@ConfigItem(
 		keyName = "specItemOutline",
 		name = "Outline",
 		description = "Draw a coloured outline around the item sprite",
-		position = 4,
+		position = 5,
 		section = specItemsSection
 	)
 	default boolean specItemOutline()
@@ -322,7 +348,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "specItemFill",
 		name = "Fill",
 		description = "Tint the item itself with a translucent colour",
-		position = 5,
+		position = 6,
 		section = specItemsSection
 	)
 	default boolean specItemFill()
@@ -336,7 +362,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "specItemFillOpacity",
 		name = "Fill opacity",
 		description = "Opacity of the item tint",
-		position = 6,
+		position = 7,
 		section = specItemsSection
 	)
 	default int specItemFillOpacity()
@@ -348,7 +374,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "specItemUnderline",
 		name = "Underline",
 		description = "Draw a coloured bar under the inventory slot",
-		position = 7,
+		position = 8,
 		section = specItemsSection
 	)
 	default boolean specItemUnderline()
@@ -360,7 +386,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "specItemPulse",
 		name = "Pulse",
 		description = "Pulse the highlight between the colour and transparent (see General for the speed)",
-		position = 8,
+		position = 9,
 		section = specItemsSection
 	)
 	default boolean specItemPulse()
@@ -380,25 +406,12 @@ public interface LightbearerHelperConfig extends Config
 		return true;
 	}
 
-	@Range(min = 1, max = 100)
-	@Units(Units.PERCENT)
-	@ConfigItem(
-		keyName = "orbThresholdPercent",
-		name = "Show from",
-		description = "Special attack energy at which the orb highlight starts",
-		position = 1,
-		section = orbSection
-	)
-	default int orbThresholdPercent()
-	{
-		return 100;
-	}
 
 	@ConfigItem(
 		keyName = "orbAlways",
 		name = "Keep showing after swap",
 		description = "Keep the orb highlight going even once a listed ring (and, if spec items are enabled, a spec weapon) is equipped",
-		position = 2,
+		position = 1,
 		section = orbSection
 	)
 	default boolean orbAlways()
@@ -410,7 +423,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbRequireSpecItem",
 		name = "Only with a spec item",
 		description = "Only highlight the orb while one of the listed spec items is in your inventory or equipped, so it stays quiet on skilling trips",
-		position = 3,
+		position = 2,
 		section = orbSection
 	)
 	default boolean orbRequireSpecItem()
@@ -423,19 +436,19 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbColor",
 		name = "Colour",
 		description = "Colour of the aura, outline and fill. The alpha sets the peak strength",
-		position = 4,
+		position = 3,
 		section = orbSection
 	)
 	default Color orbColor()
 	{
-		return new Color(255, 0, 0, 200);
+		return DEFAULT_COLOR;
 	}
 
 	@ConfigItem(
 		keyName = "orbAura",
 		name = "Aura",
 		description = "Glowing halo around the outside of the orb",
-		position = 5,
+		position = 4,
 		section = orbSection
 	)
 	default boolean orbAura()
@@ -448,7 +461,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbAuraSize",
 		name = "Aura size",
 		description = "How far the aura extends beyond the orb edge, in pixels",
-		position = 6,
+		position = 5,
 		section = orbSection
 	)
 	default int orbAuraSize()
@@ -460,7 +473,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbOutline",
 		name = "Outline",
 		description = "Ring drawn along the edge of the orb",
-		position = 7,
+		position = 6,
 		section = orbSection
 	)
 	default boolean orbOutline()
@@ -472,7 +485,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbFill",
 		name = "Fill",
 		description = "Tint the inside of the orb",
-		position = 8,
+		position = 7,
 		section = orbSection
 	)
 	default boolean orbFill()
@@ -486,7 +499,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbFillOpacity",
 		name = "Fill opacity",
 		description = "Opacity of the orb tint",
-		position = 9,
+		position = 8,
 		section = orbSection
 	)
 	default int orbFillOpacity()
@@ -498,7 +511,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbPulse",
 		name = "Pulse",
 		description = "Oscillate the orb decorations between the normal orb and the colour",
-		position = 10,
+		position = 9,
 		section = orbSection
 	)
 	default boolean orbPulse()
@@ -512,19 +525,19 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbPeriodMs",
 		name = "Pulse period",
 		description = "Time for one full pulse (normal -> colour -> normal)",
-		position = 11,
+		position = 10,
 		section = orbSection
 	)
 	default int orbPeriodMs()
 	{
-		return 1200;
+		return 2000;
 	}
 
 	@ConfigItem(
 		keyName = "orbPulseMode",
 		name = "Pulse mode",
 		description = "Smooth fade or hard blink",
-		position = 12,
+		position = 11,
 		section = orbSection
 	)
 	default OrbPulseMode orbPulseMode()
@@ -536,7 +549,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "tintOrbText",
 		name = "Tint orb text",
 		description = "Also fade the spec percentage text towards the colour",
-		position = 13,
+		position = 12,
 		section = orbSection
 	)
 	default boolean tintOrbText()

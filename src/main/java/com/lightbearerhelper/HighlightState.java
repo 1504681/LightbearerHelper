@@ -22,14 +22,15 @@ public final class HighlightState
 	}
 
 	// varp is 0..1000, threshold is a percentage
-	public static boolean orbActive(int specialAttackPercentVarp, int thresholdPercent, boolean keepAfterSwap, boolean swapDone)
+	public static boolean isSpecReady(int specialAttackPercentVarp, int thresholdPercent)
 	{
 		int threshold = Math.max(1, Math.min(100, thresholdPercent)) * 10;
-		if (specialAttackPercentVarp < threshold)
-		{
-			return false;
-		}
-		return keepAfterSwap || !swapDone;
+		return specialAttackPercentVarp >= threshold;
+	}
+
+	public static boolean orbActive(boolean specReady, boolean keepAfterSwap, boolean swapDone)
+	{
+		return specReady && (keepAfterSwap || !swapDone);
 	}
 
 	public static Mode resolve(boolean specFull, boolean wornIsLightbearer, boolean wornIsListedRing)

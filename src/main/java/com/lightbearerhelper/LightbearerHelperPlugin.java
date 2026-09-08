@@ -76,6 +76,7 @@ public class LightbearerHelperPlugin extends Plugin
 
 	private volatile HighlightState.Mode mode = HighlightState.Mode.IDLE;
 	private volatile boolean orbHighlightActive;
+	private volatile boolean specItemsActive;
 	private int wornRingId = -1;
 	private int wornWeaponId = -1;
 
@@ -106,6 +107,7 @@ public class LightbearerHelperPlugin extends Plugin
 		clientThread.invoke(this::restoreOrbText);
 		mode = HighlightState.Mode.IDLE;
 		orbHighlightActive = false;
+		specItemsActive = false;
 		wornRingId = -1;
 		wornWeaponId = -1;
 		kindCache.clear();
@@ -155,6 +157,7 @@ public class LightbearerHelperPlugin extends Plugin
 		{
 			mode = HighlightState.Mode.IDLE;
 			orbHighlightActive = false;
+			specItemsActive = false;
 		}
 	}
 
@@ -184,6 +187,7 @@ public class LightbearerHelperPlugin extends Plugin
 		{
 			mode = HighlightState.Mode.IDLE;
 			orbHighlightActive = false;
+			specItemsActive = false;
 			return;
 		}
 
@@ -200,9 +204,14 @@ public class LightbearerHelperPlugin extends Plugin
 
 		// swap is done once the ring is on, plus a spec weapon if we're highlighting those too
 		boolean swapDone = wornIsListedRing && (!config.highlightSpecItems() || isSpecItem(wornWeaponId));
+		boolean specReady = HighlightState.isSpecReady(specVarp, config.specReadyPercent());
 		orbHighlightActive = config.orbEnabled()
 			&& (haveSpecItem || !config.orbRequireSpecItem())
-			&& HighlightState.orbActive(specVarp, config.orbThresholdPercent(), config.orbAlways(), swapDone);
+			&& HighlightState.orbActive(specReady, config.orbAlways(), swapDone);
+
+		boolean specItemsWanted = config.specItemsAlways() ? specReady : mode == HighlightState.Mode.WANT_OTHER_RING;
+		specItemsActive = config.highlightSpecItems() && specItemsWanted
+			&& !(config.specSkipIfWielded() && isSpecItem(wornWeaponId));
 	}
 
 	private boolean containsSpecItem(ItemContainer container)
@@ -258,47 +267,34 @@ public class LightbearerHelperPlugin extends Plugin
 	// what to draw for this item, null for nothing. equipmentTab = worn equipment interface rather than inventory
 	public Highlight getHighlight(int itemId, boolean equipmentTab)
 	{
-		switch (mode)
+		if (equipmentTab)
 		{
-			case WANT_LIGHTBEARER:
-				if (equipmentTab)
-				{
-					if (config.highlightWornRing() && wornRingId != -1 && itemId == wornRingId)
-					{
-						return lightbearerHighlight();
-					}
-					return null;
-				}
-				if (isLightbearer(itemId))
+			if (config.highlightWornRing() && wornRingId != -1 && itemId == wornRingId)
+			{
+				if (mode == HighlightState.Mode.WANT_LIGHTBEARER)
 				{
 					return lightbearerHighlight();
 				}
-				return null;
-
-			case WANT_OTHER_RING:
-				if (equipmentTab)
-				{
-					if (config.highlightWornRing() && wornRingId != -1 && itemId == wornRingId)
-					{
-						return ringHighlight();
-					}
-					return null;
-				}
-				if (isListedRing(itemId))
+				if (mode == HighlightState.Mode.WANT_OTHER_RING)
 				{
 					return ringHighlight();
 				}
-				if (config.highlightSpecItems() && isSpecItem(itemId)
-					&& !(config.specSkipIfWielded() && isSpecItem(wornWeaponId)))
-				{
-					return specItemHighlight();
-				}
-				return null;
-
-			case IDLE:
-			default:
-				return null;
+			}
+			return null;
 		}
+		if (mode == HighlightState.Mode.WANT_LIGHTBEARER && isLightbearer(itemId))
+		{
+			return lightbearerHighlight();
+		}
+		if (mode == HighlightState.Mode.WANT_OTHER_RING && isListedRing(itemId))
+		{
+			return ringHighlight();
+		}
+		if (specItemsActive && isSpecItem(itemId))
+		{
+			return specItemHighlight();
+		}
+		return null;
 	}
 
 	private Highlight lightbearerHighlight()
