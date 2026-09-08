@@ -406,12 +406,24 @@ public interface LightbearerHelperConfig extends Config
 		return false;
 	}
 
+	@ConfigItem(
+		keyName = "orbRequireSpecItem",
+		name = "Only with a spec item",
+		description = "Only highlight the orb while one of the listed spec items is in your inventory or equipped, so it stays quiet on skilling trips",
+		position = 3,
+		section = orbSection
+	)
+	default boolean orbRequireSpecItem()
+	{
+		return true;
+	}
+
 	@Alpha
 	@ConfigItem(
 		keyName = "orbColor",
 		name = "Colour",
 		description = "Colour of the aura, outline and fill. The alpha sets the peak strength",
-		position = 3,
+		position = 4,
 		section = orbSection
 	)
 	default Color orbColor()
@@ -423,7 +435,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbAura",
 		name = "Aura",
 		description = "Glowing halo around the outside of the orb",
-		position = 4,
+		position = 5,
 		section = orbSection
 	)
 	default boolean orbAura()
@@ -436,7 +448,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbAuraSize",
 		name = "Aura size",
 		description = "How far the aura extends beyond the orb edge, in pixels",
-		position = 5,
+		position = 6,
 		section = orbSection
 	)
 	default int orbAuraSize()
@@ -448,7 +460,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbOutline",
 		name = "Outline",
 		description = "Ring drawn along the edge of the orb",
-		position = 6,
+		position = 7,
 		section = orbSection
 	)
 	default boolean orbOutline()
@@ -460,7 +472,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbFill",
 		name = "Fill",
 		description = "Tint the inside of the orb",
-		position = 7,
+		position = 8,
 		section = orbSection
 	)
 	default boolean orbFill()
@@ -474,7 +486,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbFillOpacity",
 		name = "Fill opacity",
 		description = "Opacity of the orb tint",
-		position = 8,
+		position = 9,
 		section = orbSection
 	)
 	default int orbFillOpacity()
@@ -486,7 +498,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbPulse",
 		name = "Pulse",
 		description = "Oscillate the orb decorations between the normal orb and the colour",
-		position = 9,
+		position = 10,
 		section = orbSection
 	)
 	default boolean orbPulse()
@@ -500,7 +512,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbPeriodMs",
 		name = "Pulse period",
 		description = "Time for one full pulse (normal -> colour -> normal)",
-		position = 10,
+		position = 11,
 		section = orbSection
 	)
 	default int orbPeriodMs()
@@ -512,7 +524,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "orbPulseMode",
 		name = "Pulse mode",
 		description = "Smooth fade or hard blink",
-		position = 11,
+		position = 12,
 		section = orbSection
 	)
 	default OrbPulseMode orbPulseMode()
@@ -524,7 +536,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "tintOrbText",
 		name = "Tint orb text",
 		description = "Also fade the spec percentage text towards the colour",
-		position = 12,
+		position = 13,
 		section = orbSection
 	)
 	default boolean tintOrbText()

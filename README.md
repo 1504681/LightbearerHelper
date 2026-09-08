@@ -12,7 +12,7 @@ Each of the three item highlights (Lightbearer, other rings, spec items) has its
 
 The ring and spec item lists are plain text, one name per line. Commas work too. `*` is a wildcard, matching ignores case, and lines starting with `#` are skipped. The default ring list is the four DT2 rings plus `Berserker ring*` and `Ring of suffering*`. The spec item list covers claws, godswords, DWH, elder maul, dragon and abyssal daggers, dragon halberd, ZCB, blowpipe and the nightmare staves. Spec item highlighting is off by default and the Lightbearer and spec items share the same light blue.
 
-The spec orb has three decorations you can combine: an aura around the outside (on by default, size adjustable), an outline along the edge, and a fill inside with its own opacity. Pulse is on by default with the same period and mode options. "Show from" sets the spec percentage the orb highlight starts at (100 by default), and "Keep showing after swap" leaves it running even after you've swapped. There's also an option to tint the percentage text.
+The spec orb has three decorations you can combine: an aura around the outside (on by default, size adjustable), an outline along the edge, and a fill inside with its own opacity. Pulse is on by default with the same period and mode options. "Show from" sets the spec percentage the orb highlight starts at (100 by default), and "Keep showing after swap" leaves it running even after you've swapped. By default the orb only lights up while one of the listed spec items is in your inventory or equipped, so it won't bother you on a herb run; "Only with a spec item" turns that off. There's also an option to tint the percentage text.
 
 ## Running it locally
 

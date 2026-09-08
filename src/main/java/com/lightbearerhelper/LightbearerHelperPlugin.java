@@ -195,12 +195,30 @@ public class LightbearerHelperPlugin extends Plugin
 		wornWeaponId = slotItemId(equipment, EquipmentInventorySlot.WEAPON);
 
 		boolean wornIsListedRing = isListedRing(wornRingId);
+		boolean haveSpecItem = isSpecItem(wornWeaponId) || containsSpecItem(client.getItemContainer(InventoryID.INVENTORY));
 		mode = HighlightState.resolve(specFull, isLightbearer(wornRingId), wornIsListedRing);
 
 		// swap is done once the ring is on, plus a spec weapon if we're highlighting those too
 		boolean swapDone = wornIsListedRing && (!config.highlightSpecItems() || isSpecItem(wornWeaponId));
 		orbHighlightActive = config.orbEnabled()
+			&& (haveSpecItem || !config.orbRequireSpecItem())
 			&& HighlightState.orbActive(specVarp, config.orbThresholdPercent(), config.orbAlways(), swapDone);
+	}
+
+	private boolean containsSpecItem(ItemContainer container)
+	{
+		if (container == null)
+		{
+			return false;
+		}
+		for (Item item : container.getItems())
+		{
+			if (isSpecItem(item.getId()))
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static int slotItemId(ItemContainer container, EquipmentInventorySlot slot)
