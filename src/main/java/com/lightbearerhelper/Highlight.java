@@ -2,10 +2,6 @@ package com.lightbearerhelper;
 
 import java.awt.Color;
 
-/**
- * A resolved highlight for one item: which of outline / fill / underline to draw, in which colour, and whether
- * the whole thing pulses.
- */
 public final class Highlight
 {
 	private final Color color;
@@ -56,7 +52,6 @@ public final class Highlight
 		return pulse;
 	}
 
-	/** Fill colour with the configured opacity applied on top of the colour's own alpha. */
 	public Color getFillColor()
 	{
 		int alpha = Math.round(color.getAlpha() * fillOpacityPercent / 100f);

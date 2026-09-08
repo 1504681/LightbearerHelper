@@ -20,10 +20,7 @@ public interface LightbearerHelperConfig extends Config
 		+ "Dragon warhammer\nElder maul\nDragon dagger*\nAbyssal dagger*\nDragon halberd\nZaryte crossbow\n"
 		+ "Toxic blowpipe*\nEldritch nightmare staff\nVolatile nightmare staff";
 
-	/** Light blue shared by the Lightbearer and spec item highlights. */
 	Color LIGHT_BLUE = new Color(80, 200, 255, 255);
-
-	// ---------------------------------------------------------------- sections
 
 	@ConfigSection(
 		name = "General",
@@ -60,8 +57,6 @@ public interface LightbearerHelperConfig extends Config
 	)
 	String orbSection = "orb";
 
-	// ---------------------------------------------------------------- general
-
 	@Range(min = 200, max = 3000)
 	@Units(Units.MILLISECONDS)
 	@ConfigItem(
@@ -88,8 +83,6 @@ public interface LightbearerHelperConfig extends Config
 		return OrbPulseMode.SMOOTH;
 	}
 
-	// ---------------------------------------------------------------- lightbearer
-
 	@Alpha
 	@ConfigItem(
 		keyName = "lightbearerColor",
@@ -114,7 +107,6 @@ public interface LightbearerHelperConfig extends Config
 	{
 		return true;
 	}
-
 
 	@ConfigItem(
 		keyName = "lightbearerFill",
@@ -178,8 +170,6 @@ public interface LightbearerHelperConfig extends Config
 		return true;
 	}
 
-	// ---------------------------------------------------------------- other rings
-
 	@ConfigItem(
 		keyName = "ringList",
 		name = "Rings",
@@ -216,7 +206,6 @@ public interface LightbearerHelperConfig extends Config
 	{
 		return true;
 	}
-
 
 	@ConfigItem(
 		keyName = "ringFill",
@@ -267,8 +256,6 @@ public interface LightbearerHelperConfig extends Config
 	{
 		return false;
 	}
-
-	// ---------------------------------------------------------------- spec items
 
 	@ConfigItem(
 		keyName = "highlightSpecItems",
@@ -331,7 +318,6 @@ public interface LightbearerHelperConfig extends Config
 		return true;
 	}
 
-
 	@ConfigItem(
 		keyName = "specItemFill",
 		name = "Fill",
@@ -381,8 +367,6 @@ public interface LightbearerHelperConfig extends Config
 	{
 		return false;
 	}
-
-	// ---------------------------------------------------------------- spec orb
 
 	@ConfigItem(
 		keyName = "orbEnabled",

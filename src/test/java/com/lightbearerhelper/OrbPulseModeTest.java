@@ -27,7 +27,6 @@ public class OrbPulseModeTest
 	@Test
 	public void tinyPeriodIsClamped()
 	{
-		// period below 100ms is treated as 100ms rather than dividing by something silly
 		assertEquals(1f, OrbPulseMode.SMOOTH.intensity(50, 1), 1e-4);
 	}
 }

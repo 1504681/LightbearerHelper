@@ -5,11 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import net.runelite.client.util.WildcardMatcher;
 
-/**
- * Matches item names against a user supplied list of patterns. One pattern per line (commas also
- * accepted), {@code *} wildcards, case-insensitive, blank lines and lines starting with {@code #}
- * are ignored.
- */
+// one pattern per line or comma separated, * wildcards, case insensitive, # comments
 public final class ItemMatcher
 {
 	private final List<String> patterns;

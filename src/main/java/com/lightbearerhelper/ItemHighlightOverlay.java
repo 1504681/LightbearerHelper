@@ -16,10 +16,6 @@ import net.runelite.api.widgets.WidgetUtil;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
 
-/**
- * Draws the Lightbearer / other ring / spec item highlights on inventory and worn-equipment items.
- * Each highlight is any combination of outline, fill and underline, optionally pulsing.
- */
 public class ItemHighlightOverlay extends WidgetItemOverlay
 {
 	private static final int UNDERLINE_HEIGHT = 2;

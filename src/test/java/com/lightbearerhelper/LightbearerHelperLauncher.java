@@ -3,10 +3,7 @@ package com.lightbearerhelper;
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;
 
-/**
- * Local development entry point: starts a full RuneLite client with this plugin registered.
- * Run with {@code ./gradlew run} (or from the IDE with the {@code -ea} VM flag).
- */
+// ./gradlew run, or run this from the IDE with -ea
 public class LightbearerHelperLauncher
 {
 	public static void main(String[] args) throws Exception

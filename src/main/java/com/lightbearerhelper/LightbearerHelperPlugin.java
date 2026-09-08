@@ -38,14 +38,13 @@ import org.slf4j.LoggerFactory;
 )
 public class LightbearerHelperPlugin extends Plugin
 {
-	/** Plugin version — keep in sync with build.gradle. */
+	// keep in sync with build.gradle
 	public static final String VERSION = "1.0.0";
 
 	private static final Logger log = LoggerFactory.getLogger(LightbearerHelperPlugin.class);
 
 	private static final String LIGHTBEARER_NAME = "lightbearer";
 
-	/** Bit flags cached per item id. */
 	private static final int KIND_LIGHTBEARER = 1;
 	private static final int KIND_RING = 2;
 	private static final int KIND_SPEC = 4;
@@ -80,7 +79,7 @@ public class LightbearerHelperPlugin extends Plugin
 	private int wornRingId = -1;
 	private int wornWeaponId = -1;
 
-	/** Original spec orb text colour, captured before we tint it; null while untouched. */
+	// spec orb text colour before we touched it, null when we haven't
 	private Integer originalOrbTextColor;
 
 	@Provides
@@ -113,8 +112,6 @@ public class LightbearerHelperPlugin extends Plugin
 		itemHighlightOverlay.invalidateCache();
 		log.info("Lightbearer Helper stopped");
 	}
-
-	// ------------------------------------------------------------------ events
 
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
@@ -174,8 +171,6 @@ public class LightbearerHelperPlugin extends Plugin
 		}
 	}
 
-	// ------------------------------------------------------------------ state
-
 	private void rebuildMatchers()
 	{
 		ringMatcher = new ItemMatcher(config.ringList());
@@ -183,7 +178,6 @@ public class LightbearerHelperPlugin extends Plugin
 		kindCache.clear();
 	}
 
-	/** Must run on the client thread. */
 	private void recompute()
 	{
 		if (client.getGameState() != GameState.LOGGED_IN)
@@ -203,7 +197,7 @@ public class LightbearerHelperPlugin extends Plugin
 		boolean wornIsListedRing = isListedRing(wornRingId);
 		mode = HighlightState.resolve(specFull, isLightbearer(wornRingId), wornIsListedRing);
 
-		// the swap counts as done once the ring is on and, if spec items are being highlighted, a spec weapon is wielded
+		// swap is done once the ring is on, plus a spec weapon if we're highlighting those too
 		boolean swapDone = wornIsListedRing && (!config.highlightSpecItems() || isSpecItem(wornWeaponId));
 		orbHighlightActive = config.orbEnabled()
 			&& HighlightState.orbActive(specVarp, config.orbThresholdPercent(), config.orbAlways(), swapDone);
@@ -229,7 +223,6 @@ public class LightbearerHelperPlugin extends Plugin
 		return orbHighlightActive;
 	}
 
-	/** 0..1 how strongly the orb decorations should show right now (1 when not pulsing). */
 	public float orbPulseFactor()
 	{
 		if (!config.orbPulse())
@@ -239,18 +232,12 @@ public class LightbearerHelperPlugin extends Plugin
 		return config.orbPulseMode().intensity(System.currentTimeMillis(), config.orbPeriodMs());
 	}
 
-	/** 0..1 opacity multiplier for item highlights that have Pulse enabled. */
 	public float itemPulseFactor()
 	{
 		return config.itemPulseMode().intensity(System.currentTimeMillis(), config.itemPulsePeriodMs());
 	}
 
-	/**
-	 * Highlight to draw for an item, or null for none.
-	 *
-	 * @param itemId       item id
-	 * @param equipmentTab true when the item is drawn in the worn-equipment interface rather than the inventory
-	 */
+	// what to draw for this item, null for nothing. equipmentTab = worn equipment interface rather than inventory
 	public Highlight getHighlight(int itemId, boolean equipmentTab)
 	{
 		switch (mode)
@@ -258,7 +245,6 @@ public class LightbearerHelperPlugin extends Plugin
 			case WANT_LIGHTBEARER:
 				if (equipmentTab)
 				{
-					// the ring currently worn is the one to take off
 					if (config.highlightWornRing() && wornRingId != -1 && itemId == wornRingId)
 					{
 						return lightbearerHighlight();
@@ -315,8 +301,6 @@ public class LightbearerHelperPlugin extends Plugin
 			config.specItemFill(), config.specItemFillOpacity(), config.specItemUnderline(), config.specItemPulse());
 	}
 
-	// ------------------------------------------------------------------ item classification
-
 	public boolean isLightbearer(int itemId)
 	{
 		return (kind(itemId) & KIND_LIGHTBEARER) != 0;
@@ -332,7 +316,6 @@ public class LightbearerHelperPlugin extends Plugin
 		return (kind(itemId) & KIND_SPEC) != 0;
 	}
 
-	/** Must run on the client thread (item compositions). */
 	private int kind(int itemId)
 	{
 		if (itemId <= 0)
@@ -372,8 +355,6 @@ public class LightbearerHelperPlugin extends Plugin
 		String name = composition.getName();
 		return name == null || "null".equals(name) ? null : name;
 	}
-
-	// ------------------------------------------------------------------ orb text tint
 
 	private void tintOrbText()
 	{

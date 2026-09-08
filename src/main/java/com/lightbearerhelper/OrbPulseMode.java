@@ -1,13 +1,8 @@
 package com.lightbearerhelper;
 
-/**
- * Waveform used to oscillate the spec orb colour.
- */
 public enum OrbPulseMode
 {
-	/** Smooth fade between the normal orb and the chosen colour. */
 	SMOOTH("Smooth"),
-	/** Hard on/off blink. */
 	BLINK("Blink");
 
 	private final String label;
@@ -17,13 +12,7 @@ public enum OrbPulseMode
 		this.label = label;
 	}
 
-	/**
-	 * Intensity of the chosen colour at a point in time.
-	 *
-	 * @param nowMs    current time in milliseconds
-	 * @param periodMs full oscillation period (normal -> colour -> normal) in milliseconds
-	 * @return 0.0 (normal orb, fully transparent overlay) .. 1.0 (chosen colour at its configured alpha)
-	 */
+	// 0 = nothing showing, 1 = full colour. periodMs is one whole cycle
 	public float intensity(long nowMs, int periodMs)
 	{
 		int period = Math.max(100, periodMs);

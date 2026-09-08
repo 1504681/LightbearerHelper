@@ -20,15 +20,11 @@ import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
 
-/**
- * Decorates the special attack orb with any combination of a glowing aura around it, an outline
- * along its edge and a tint inside it, optionally pulsing between the normal orb and the colour.
- */
 public class SpecOrbOverlay extends Overlay
 {
 	private static final Stroke OUTLINE_STROKE = new BasicStroke(2f);
 
-	/** Orb fill widgets across the minimap layouts; first non-hidden one wins. */
+	// the orb widget differs per minimap layout, first visible one wins
 	private static final int[] ORB_COMPONENTS = {
 		InterfaceID.Orbs.SPECENERGY_INDICATOR,
 		InterfaceID.OrbsNomap.SPECENERGY_INDICATOR,
@@ -113,7 +109,6 @@ public class SpecOrbOverlay extends Overlay
 		return null;
 	}
 
-	/** Soft halo from the orb edge outwards, fading to transparent at {@code auraSize} px. */
 	private void drawAura(Graphics2D graphics, Rectangle bounds, Ellipse2D orbShape, Color color, int peakAlpha)
 	{
 		int auraSize = Math.max(1, config.orbAuraSize());
