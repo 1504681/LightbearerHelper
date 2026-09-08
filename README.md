@@ -8,7 +8,7 @@ Once spec hits 100% the rings you've listed (Ultor, Bellator, Magus, Venator and
 
 ## Settings
 
-Each of the three item highlights (Lightbearer, other rings, spec items) has its own colour and can be drawn as an outline around the sprite, a translucent fill of the slot with adjustable opacity, an underline bar, or any mix of those. Each can also pulse between its colour and nothing. The pulse speed and smooth/blink mode are shared and live under General. Default is 1200 ms.
+Each of the three item highlights (Lightbearer, other rings, spec items) has its own colour and can be drawn as an outline around the sprite, a translucent tint over the item itself with adjustable opacity, an underline bar, or any mix of those. Each can also pulse between its colour and nothing. The pulse speed and smooth/blink mode are shared and live under General. Default is 1200 ms.
 
 The ring and spec item lists are plain text, one name per line. Commas work too. `*` is a wildcard, matching ignores case, and lines starting with `#` are skipped. The default ring list is the four DT2 rings plus `Berserker ring*` and `Ring of suffering*`. The spec item list covers claws, godswords, DWH, elder maul, dragon and abyssal daggers, dragon halberd, ZCB, blowpipe and the nightmare staves. Spec item highlighting is off by default and the Lightbearer and spec items share the same light blue.
 

@@ -14,6 +14,8 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.api.widgets.WidgetUtil;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.util.AsyncBufferedImage;
+import net.runelite.client.util.ImageUtil;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
 
 public class ItemHighlightOverlay extends WidgetItemOverlay
@@ -23,6 +25,7 @@ public class ItemHighlightOverlay extends WidgetItemOverlay
 	private final ItemManager itemManager;
 	private final LightbearerHelperPlugin plugin;
 	private final Map<Long, BufferedImage> outlineCache = new HashMap<>();
+	private final Map<Long, BufferedImage> fillCache = new HashMap<>();
 
 	@Inject
 	public ItemHighlightOverlay(ItemManager itemManager, LightbearerHelperPlugin plugin)
@@ -61,8 +64,11 @@ public class ItemHighlightOverlay extends WidgetItemOverlay
 		Color color = highlight.getColor();
 		if (highlight.isFill())
 		{
-			graphics.setColor(highlight.getFillColor());
-			graphics.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
+			BufferedImage fill = getFill(itemId, widgetItem.getQuantity(), highlight.getFillColor());
+			if (fill != null)
+			{
+				graphics.drawImage(fill, bounds.x, bounds.y, null);
+			}
 		}
 		if (highlight.isOutline())
 		{
@@ -84,6 +90,7 @@ public class ItemHighlightOverlay extends WidgetItemOverlay
 	void invalidateCache()
 	{
 		outlineCache.clear();
+		fillCache.clear();
 	}
 
 	private static boolean isEquipmentInterface(WidgetItem widgetItem)
@@ -92,9 +99,24 @@ public class ItemHighlightOverlay extends WidgetItemOverlay
 		return widget != null && WidgetUtil.componentToInterface(widget.getId()) == InterfaceID.WORNITEMS;
 	}
 
+	private BufferedImage getFill(int itemId, int quantity, Color color)
+	{
+		long key = cacheKey(itemId, quantity, color);
+		BufferedImage image = fillCache.get(key);
+		if (image == null)
+		{
+			AsyncBufferedImage sprite = itemManager.getImage(itemId, quantity, false);
+			image = ImageUtil.fillImage(sprite, color);
+			fillCache.put(key, image);
+			// the sprite is normally ready by now, but if it wasn't, redo the fill once it is
+			sprite.onLoaded(() -> fillCache.remove(key));
+		}
+		return image;
+	}
+
 	private BufferedImage getOutline(int itemId, int quantity, Color color)
 	{
-		long key = ((long) itemId << 40) | ((long) (quantity & 0xFF) << 32) | (color.getRGB() & 0xFFFFFFFFL);
+		long key = cacheKey(itemId, quantity, color);
 		BufferedImage image = outlineCache.get(key);
 		if (image == null)
 		{
@@ -105,5 +127,10 @@ public class ItemHighlightOverlay extends WidgetItemOverlay
 			}
 		}
 		return image;
+	}
+
+	private static long cacheKey(int itemId, int quantity, Color color)
+	{
+		return ((long) itemId << 40) | ((long) (quantity & 0xFF) << 32) | (color.getRGB() & 0xFFFFFFFFL);
 	}
 }

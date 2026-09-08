@@ -111,7 +111,7 @@ public interface LightbearerHelperConfig extends Config
 	@ConfigItem(
 		keyName = "lightbearerFill",
 		name = "Fill",
-		description = "Fill the inventory slot with a translucent colour",
+		description = "Tint the item itself with a translucent colour",
 		position = 2,
 		section = lightbearerSection
 	)
@@ -125,7 +125,7 @@ public interface LightbearerHelperConfig extends Config
 	@ConfigItem(
 		keyName = "lightbearerFillOpacity",
 		name = "Fill opacity",
-		description = "Opacity of the slot fill",
+		description = "Opacity of the item tint",
 		position = 3,
 		section = lightbearerSection
 	)
@@ -210,7 +210,7 @@ public interface LightbearerHelperConfig extends Config
 	@ConfigItem(
 		keyName = "ringFill",
 		name = "Fill",
-		description = "Fill the inventory slot with a translucent colour",
+		description = "Tint the item itself with a translucent colour",
 		position = 3,
 		section = ringsSection
 	)
@@ -224,7 +224,7 @@ public interface LightbearerHelperConfig extends Config
 	@ConfigItem(
 		keyName = "ringFillOpacity",
 		name = "Fill opacity",
-		description = "Opacity of the slot fill",
+		description = "Opacity of the item tint",
 		position = 4,
 		section = ringsSection
 	)
@@ -321,7 +321,7 @@ public interface LightbearerHelperConfig extends Config
 	@ConfigItem(
 		keyName = "specItemFill",
 		name = "Fill",
-		description = "Fill the inventory slot with a translucent colour",
+		description = "Tint the item itself with a translucent colour",
 		position = 5,
 		section = specItemsSection
 	)
@@ -335,7 +335,7 @@ public interface LightbearerHelperConfig extends Config
 	@ConfigItem(
 		keyName = "specItemFillOpacity",
 		name = "Fill opacity",
-		description = "Opacity of the slot fill",
+		description = "Opacity of the item tint",
 		position = 6,
 		section = specItemsSection
 	)
