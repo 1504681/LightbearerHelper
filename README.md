@@ -34,9 +34,9 @@ A RuneLite plugin that nags you to do the Lightbearer ring swap in both directio
 Requirements: a JDK 11 or newer on your `PATH` (17 recommended). Gradle is bundled through the wrapper.
 
 ```bash
-git clone git@github.com:1504681/LightbearerHelper.git
+git clone https://github.com/1504681/LightbearerHelper.git
 cd LightbearerHelper
-./gradlew run          # Windows: gradlew.bat run
+./gradlew run          # Windows: .\gradlew.bat run
 ```
 
 `run` builds the plugin and launches a full RuneLite client in developer mode with the plugin registered (see
