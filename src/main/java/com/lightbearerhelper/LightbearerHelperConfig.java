@@ -181,7 +181,7 @@ public interface LightbearerHelperConfig extends Config
 	)
 	default boolean highlightWornRing()
 	{
-		return true;
+		return false;
 	}
 
 	@ConfigItem(
@@ -453,7 +453,7 @@ public interface LightbearerHelperConfig extends Config
 	)
 	default boolean orbAura()
 	{
-		return true;
+		return false;
 	}
 
 	@Range(min = 2, max = 30)
@@ -478,7 +478,7 @@ public interface LightbearerHelperConfig extends Config
 	)
 	default boolean orbOutline()
 	{
-		return false;
+		return true;
 	}
 
 	@ConfigItem(
@@ -516,7 +516,7 @@ public interface LightbearerHelperConfig extends Config
 	)
 	default boolean orbPulse()
 	{
-		return true;
+		return false;
 	}
 
 	@Range(min = 200, max = 3000)
