@@ -18,7 +18,7 @@ public interface LightbearerHelperConfig extends Config
 
 	String DEFAULT_SPEC_ITEMS = "Dragon claws\nBurning claws\nVoidwaker\nBandos godsword\nArmadyl godsword\nSaradomin godsword\n"
 		+ "Dragon warhammer\nElder maul\nDragon dagger*\nAbyssal dagger*\nDragon halberd\nZaryte crossbow\n"
-		+ "Toxic blowpipe*\nEldritch nightmare staff\nVolatile nightmare staff";
+		+ "Toxic blowpipe*\nEldritch nightmare staff\nVolatile nightmare staff\nKeris partisan of the sun";
 
 	Color DEFAULT_COLOR = new Color(0xB3, 0xA1, 0x6C, 0xC8);
 
@@ -298,7 +298,7 @@ public interface LightbearerHelperConfig extends Config
 	@ConfigItem(
 		keyName = "specItemList",
 		name = "Spec items",
-		description = "Special attack items to highlight when spec is full. One per line, * wildcards allowed, e.g. Dragon dagger*",
+		description = "Special attack items to highlight when spec is full. One per line, * wildcards allowed, e.g. Dragon dagger*. End a line in a percentage to set that weapon's spec cost for Only when affordable, e.g. Dragon claws 50%",
 		position = 2,
 		section = specItemsSection
 	)
@@ -308,10 +308,72 @@ public interface LightbearerHelperConfig extends Config
 	}
 
 	@ConfigItem(
+		keyName = "specAffordable",
+		name = "Only when affordable",
+		description = "Highlight a spec weapon once your spec energy covers its own special attack, instead of waiting for Spec ready at. Costs come from a built-in table; a line in the list can set one, e.g. Dragon claws 50%. Weapons not in the table use Spec ready at. The spec orb follows the weapons you carry",
+		position = 3,
+		section = specItemsSection
+	)
+	default boolean specAffordable()
+	{
+		return false;
+	}
+
+	@ConfigItem(
+		keyName = "specAdrenaline",
+		name = "Halve costs on Liquid adrenaline",
+		description = "While the Tombs of Amascut liquid adrenaline is active, special attacks cost half, so count them as affordable at half the energy",
+		position = 4,
+		section = specItemsSection
+	)
+	default boolean specAdrenaline()
+	{
+		return true;
+	}
+
+	@Alpha
+	@ConfigItem(
+		keyName = "lowPrayerColor",
+		name = "Short of prayer colour",
+		description = "Colour for a spec weapon whose special also costs prayer points you don't have, the Keris partisan of the sun's 50. Spec is ready but the special won't go off",
+		position = 5,
+		section = specItemsSection
+	)
+	default Color lowPrayerColor()
+	{
+		return new Color(0xE0, 0x40, 0x40, 0xC8);
+	}
+
+	@ConfigItem(
+		keyName = "healOnlyWhenHurt",
+		name = "Keris of the sun only when hurt",
+		description = "Only highlight the Keris partisan of the sun, whose special is a heal, while your hitpoints are below the value below",
+		position = 6,
+		section = specItemsSection
+	)
+	default boolean healOnlyWhenHurt()
+	{
+		return true;
+	}
+
+	@Range(min = 1, max = 99)
+	@ConfigItem(
+		keyName = "healBelowHp",
+		name = "Hurt means below",
+		description = "Hitpoints under which the Keris partisan of the sun counts as worth using",
+		position = 7,
+		section = specItemsSection
+	)
+	default int healBelowHp()
+	{
+		return 40;
+	}
+
+	@ConfigItem(
 		keyName = "specSkipIfWielded",
 		name = "Skip when spec weapon wielded",
 		description = "Don't highlight spec items in the inventory while a listed spec weapon is already equipped",
-		position = 3,
+		position = 8,
 		section = specItemsSection
 	)
 	default boolean specSkipIfWielded()
@@ -324,7 +386,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "specItemColor",
 		name = "Colour",
 		description = "Colour used for the spec item highlight",
-		position = 4,
+		position = 9,
 		section = specItemsSection
 	)
 	default Color specItemColor()
@@ -336,7 +398,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "specItemOutline",
 		name = "Outline",
 		description = "Draw a coloured outline around the item sprite",
-		position = 5,
+		position = 10,
 		section = specItemsSection
 	)
 	default boolean specItemOutline()
@@ -348,7 +410,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "specItemFill",
 		name = "Fill",
 		description = "Tint the item itself with a translucent colour",
-		position = 6,
+		position = 11,
 		section = specItemsSection
 	)
 	default boolean specItemFill()
@@ -362,7 +424,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "specItemFillOpacity",
 		name = "Fill opacity",
 		description = "Opacity of the item tint",
-		position = 7,
+		position = 12,
 		section = specItemsSection
 	)
 	default int specItemFillOpacity()
@@ -374,7 +436,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "specItemUnderline",
 		name = "Underline",
 		description = "Draw a coloured bar under the inventory slot",
-		position = 8,
+		position = 13,
 		section = specItemsSection
 	)
 	default boolean specItemUnderline()
@@ -386,7 +448,7 @@ public interface LightbearerHelperConfig extends Config
 		keyName = "specItemPulse",
 		name = "Pulse",
 		description = "Pulse the highlight between the colour and transparent (see General for the speed)",
-		position = 9,
+		position = 14,
 		section = specItemsSection
 	)
 	default boolean specItemPulse()

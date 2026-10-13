@@ -69,7 +69,7 @@ public class SpecOrbOverlay extends Overlay
 			return null;
 		}
 
-		Color color = config.orbColor();
+		Color color = plugin.orbColor();
 		float factor = plugin.orbPulseFactor();
 		int peakAlpha = Math.round(color.getAlpha() * factor);
 		if (peakAlpha <= 0)

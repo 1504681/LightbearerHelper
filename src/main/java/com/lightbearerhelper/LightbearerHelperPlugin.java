@@ -12,12 +12,15 @@ import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.ItemContainer;
+import net.runelite.api.Skill;
 import net.runelite.api.VarPlayer;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.events.StatChanged;
 import net.runelite.api.events.VarbitChanged;
 import net.runelite.api.gameval.InterfaceID;
 import net.runelite.api.gameval.ItemID;
+import net.runelite.api.gameval.VarbitID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
@@ -39,7 +42,7 @@ import org.slf4j.LoggerFactory;
 public class LightbearerHelperPlugin extends Plugin
 {
 	// keep in sync with build.gradle
-	public static final String VERSION = "1.0.2";
+	public static final String VERSION = "1.0.3";
 
 	private static final Logger log = LoggerFactory.getLogger(LightbearerHelperPlugin.class);
 
@@ -73,10 +76,15 @@ public class LightbearerHelperPlugin extends Plugin
 	private ItemMatcher ringMatcher = new ItemMatcher("");
 	private ItemMatcher specMatcher = new ItemMatcher("");
 	private final Map<Integer, Integer> kindCache = new HashMap<>();
+	private final Map<Integer, SpecCosts.Cost> costCache = new HashMap<>();
 
 	private volatile HighlightState.Mode mode = HighlightState.Mode.IDLE;
 	private volatile boolean orbHighlightActive;
+	// the orb shows the short-of-prayer colour: the only usable special needs prayer points we don't have
+	private volatile boolean orbLowPrayer;
 	private volatile boolean specItemsActive;
+	private volatile HighlightState.Vitals vitals = new HighlightState.Vitals(0, 0, 0, false);
+	private volatile HighlightState.SpecRules specRules = new HighlightState.SpecRules(100, false, false, 0);
 	private int wornRingId = -1;
 	private int wornWeaponId = -1;
 
@@ -111,6 +119,7 @@ public class LightbearerHelperPlugin extends Plugin
 		wornRingId = -1;
 		wornWeaponId = -1;
 		kindCache.clear();
+		costCache.clear();
 		itemHighlightOverlay.invalidateCache();
 		log.info("Lightbearer Helper stopped");
 	}
@@ -130,7 +139,17 @@ public class LightbearerHelperPlugin extends Plugin
 	@Subscribe
 	public void onVarbitChanged(VarbitChanged event)
 	{
-		if (event.getVarpId() == VarPlayer.SPECIAL_ATTACK_PERCENT)
+		if (event.getVarpId() == VarPlayer.SPECIAL_ATTACK_PERCENT
+			|| event.getVarbitId() == VarbitID.TOA_MIDRAIDLOOT_ENERGY_ACTIVE)
+		{
+			recompute();
+		}
+	}
+
+	@Subscribe
+	public void onStatChanged(StatChanged event)
+	{
+		if (event.getSkill() == Skill.PRAYER || event.getSkill() == Skill.HITPOINTS)
 		{
 			recompute();
 		}
@@ -179,6 +198,7 @@ public class LightbearerHelperPlugin extends Plugin
 		ringMatcher = new ItemMatcher(config.ringList());
 		specMatcher = new ItemMatcher(config.specItemList());
 		kindCache.clear();
+		costCache.clear();
 	}
 
 	private void recompute()
@@ -193,25 +213,76 @@ public class LightbearerHelperPlugin extends Plugin
 
 		int specVarp = client.getVarpValue(VarPlayer.SPECIAL_ATTACK_PERCENT);
 		boolean specFull = HighlightState.isSpecFull(specVarp);
+		vitals = new HighlightState.Vitals(specVarp,
+			client.getBoostedSkillLevel(Skill.PRAYER),
+			client.getBoostedSkillLevel(Skill.HITPOINTS),
+			client.getVarbitValue(VarbitID.TOA_MIDRAIDLOOT_ENERGY_ACTIVE) != 0);
+		specRules = new HighlightState.SpecRules(config.specReadyPercent(), config.specAffordable(),
+			config.specAdrenaline(), config.healOnlyWhenHurt() ? config.healBelowHp() : 0);
 
 		ItemContainer equipment = client.getItemContainer(InventoryID.EQUIPMENT);
+		ItemContainer inventory = client.getItemContainer(InventoryID.INVENTORY);
 		wornRingId = slotItemId(equipment, EquipmentInventorySlot.RING);
 		wornWeaponId = slotItemId(equipment, EquipmentInventorySlot.WEAPON);
 
 		boolean wornIsListedRing = isListedRing(wornRingId);
-		boolean haveSpecItem = isSpecItem(wornWeaponId) || containsSpecItem(client.getItemContainer(InventoryID.INVENTORY));
+		boolean haveSpecItem = isSpecItem(wornWeaponId) || containsSpecItem(inventory);
 		mode = HighlightState.resolve(specFull, isLightbearer(wornRingId), wornIsListedRing);
 
 		// swap is done once the ring is on, plus a spec weapon if we're highlighting those too
 		boolean swapDone = wornIsListedRing && (!config.highlightSpecItems() || isSpecItem(wornWeaponId));
 		boolean specReady = HighlightState.isSpecReady(specVarp, config.specReadyPercent());
+		orbLowPrayer = false;
+		if (config.specAffordable() && haveSpecItem)
+		{
+			// the orb goes by the specials we could actually fire
+			HighlightState.SpecStatus carried = carriedStatus(inventory);
+			specReady = carried != HighlightState.SpecStatus.NOT_READY;
+			orbLowPrayer = carried == HighlightState.SpecStatus.LOW_PRAYER;
+		}
 		orbHighlightActive = config.orbEnabled()
 			&& (haveSpecItem || !config.orbRequireSpecItem())
 			&& HighlightState.orbActive(specReady, config.orbAlways(), swapDone);
 
-		boolean specItemsWanted = config.specItemsAlways() ? specReady : mode == HighlightState.Mode.WANT_OTHER_RING;
+		boolean specItemsWanted = config.specItemsAlways() || mode == HighlightState.Mode.WANT_OTHER_RING;
 		specItemsActive = config.highlightSpecItems() && specItemsWanted
 			&& !(config.specSkipIfWielded() && isSpecItem(wornWeaponId));
+	}
+
+	// the best status over the wielded weapon and the spec items in the inventory
+	private HighlightState.SpecStatus carriedStatus(ItemContainer inventory)
+	{
+		HighlightState.SpecStatus best = HighlightState.SpecStatus.NOT_READY;
+		if (isSpecItem(wornWeaponId))
+		{
+			best = specStatus(wornWeaponId);
+		}
+		if (inventory != null)
+		{
+			for (Item item : inventory.getItems())
+			{
+				if (isSpecItem(item.getId()))
+				{
+					best = HighlightState.better(best, specStatus(item.getId()));
+				}
+			}
+		}
+		return best;
+	}
+
+	private HighlightState.SpecStatus specStatus(int itemId)
+	{
+		return HighlightState.specStatus(specCost(itemId), specRules, vitals);
+	}
+
+	public boolean isOrbLowPrayer()
+	{
+		return orbLowPrayer;
+	}
+
+	public Color orbColor()
+	{
+		return orbLowPrayer ? config.lowPrayerColor() : config.orbColor();
 	}
 
 	private boolean containsSpecItem(ItemContainer container)
@@ -292,7 +363,15 @@ public class LightbearerHelperPlugin extends Plugin
 		}
 		if (specItemsActive && isSpecItem(itemId))
 		{
-			return specItemHighlight();
+			switch (specStatus(itemId))
+			{
+				case READY:
+					return specItemHighlight(config.specItemColor());
+				case LOW_PRAYER:
+					return specItemHighlight(config.lowPrayerColor());
+				default:
+					return null;
+			}
 		}
 		return null;
 	}
@@ -309,9 +388,9 @@ public class LightbearerHelperPlugin extends Plugin
 			config.ringFill(), config.ringFillOpacity(), config.ringUnderline(), config.ringPulse());
 	}
 
-	private Highlight specItemHighlight()
+	private Highlight specItemHighlight(Color color)
 	{
-		return new Highlight(config.specItemColor(), config.specItemOutline(),
+		return new Highlight(color, config.specItemOutline(),
 			config.specItemFill(), config.specItemFillOpacity(), config.specItemUnderline(), config.specItemPulse());
 	}
 
@@ -328,6 +407,23 @@ public class LightbearerHelperPlugin extends Plugin
 	public boolean isSpecItem(int itemId)
 	{
 		return (kind(itemId) & KIND_SPEC) != 0;
+	}
+
+	// what the item's special costs, null when unknown
+	private SpecCosts.Cost specCost(int itemId)
+	{
+		if (itemId <= 0)
+		{
+			return null;
+		}
+		if (costCache.containsKey(itemId))
+		{
+			return costCache.get(itemId);
+		}
+		String name = itemName(itemId);
+		SpecCosts.Cost cost = SpecCosts.of(name, specMatcher.costOf(name));
+		costCache.put(itemId, cost);
+		return cost;
 	}
 
 	private int kind(int itemId)
@@ -383,7 +479,7 @@ public class LightbearerHelperPlugin extends Plugin
 		}
 		float intensity = orbPulseFactor();
 		Color from = new Color(originalOrbTextColor);
-		Color to = config.orbColor();
+		Color to = orbColor();
 		int r = lerp(from.getRed(), to.getRed(), intensity);
 		int g = lerp(from.getGreen(), to.getGreen(), intensity);
 		int b = lerp(from.getBlue(), to.getBlue(), intensity);

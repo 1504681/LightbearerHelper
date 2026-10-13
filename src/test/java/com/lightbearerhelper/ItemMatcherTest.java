@@ -2,6 +2,7 @@ package com.lightbearerhelper;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import org.junit.Test;
@@ -35,6 +36,18 @@ public class ItemMatcherTest
 		assertTrue(matcher.matches("Abyssal dagger"));
 		assertTrue(matcher.matches("Ring of suffering (i)"));
 		assertFalse(matcher.matches("Dragon claws"));
+	}
+
+	@Test
+	public void costSuffix()
+	{
+		ItemMatcher matcher = new ItemMatcher("Dragon claws 50%\nKeris partisan of the sun 40%\nVoidwaker");
+		assertEquals(Arrays.asList("dragon claws", "keris partisan of the sun", "voidwaker"), matcher.getPatterns());
+		assertTrue(matcher.matches("Dragon claws"));
+		assertEquals(Integer.valueOf(50), matcher.costOf("Dragon claws"));
+		assertEquals(Integer.valueOf(40), matcher.costOf("Keris partisan of the sun"));
+		assertNull(matcher.costOf("Voidwaker"));
+		assertNull(matcher.costOf("Bronze dagger"));
 	}
 
 	@Test
