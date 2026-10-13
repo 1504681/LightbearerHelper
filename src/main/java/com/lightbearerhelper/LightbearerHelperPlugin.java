@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 public class LightbearerHelperPlugin extends Plugin
 {
 	// keep in sync with build.gradle
-	public static final String VERSION = "1.0.3";
+	public static final String VERSION = "1.0.4";
 
 	private static final Logger log = LoggerFactory.getLogger(LightbearerHelperPlugin.class);
 
@@ -80,8 +80,6 @@ public class LightbearerHelperPlugin extends Plugin
 
 	private volatile HighlightState.Mode mode = HighlightState.Mode.IDLE;
 	private volatile boolean orbHighlightActive;
-	// the orb shows the short-of-prayer colour: the only usable special needs prayer points we don't have
-	private volatile boolean orbLowPrayer;
 	private volatile boolean specItemsActive;
 	private volatile HighlightState.Vitals vitals = new HighlightState.Vitals(0, 0, 0, false);
 	private volatile HighlightState.SpecRules specRules = new HighlightState.SpecRules(100, false, false, 0);
@@ -232,13 +230,10 @@ public class LightbearerHelperPlugin extends Plugin
 		// swap is done once the ring is on, plus a spec weapon if we're highlighting those too
 		boolean swapDone = wornIsListedRing && (!config.highlightSpecItems() || isSpecItem(wornWeaponId));
 		boolean specReady = HighlightState.isSpecReady(specVarp, config.specReadyPercent());
-		orbLowPrayer = false;
 		if (config.specAffordable() && haveSpecItem)
 		{
-			// the orb goes by the specials we could actually fire
-			HighlightState.SpecStatus carried = carriedStatus(inventory);
-			specReady = carried != HighlightState.SpecStatus.NOT_READY;
-			orbLowPrayer = carried == HighlightState.SpecStatus.LOW_PRAYER;
+			// the orb goes by the specials we could fire, prayer or not
+			specReady = carriedStatus(inventory) != HighlightState.SpecStatus.NOT_READY;
 		}
 		orbHighlightActive = config.orbEnabled()
 			&& (haveSpecItem || !config.orbRequireSpecItem())
@@ -273,16 +268,6 @@ public class LightbearerHelperPlugin extends Plugin
 	private HighlightState.SpecStatus specStatus(int itemId)
 	{
 		return HighlightState.specStatus(specCost(itemId), specRules, vitals);
-	}
-
-	public boolean isOrbLowPrayer()
-	{
-		return orbLowPrayer;
-	}
-
-	public Color orbColor()
-	{
-		return orbLowPrayer ? config.lowPrayerColor() : config.orbColor();
 	}
 
 	private boolean containsSpecItem(ItemContainer container)
@@ -370,8 +355,14 @@ public class LightbearerHelperPlugin extends Plugin
 				case LOW_PRAYER:
 					return specItemHighlight(config.lowPrayerColor());
 				default:
-					return null;
+					break;
 			}
+		}
+		// the standing mark on the keris, so it's found at a glance whatever the spec
+		if (config.healAlwaysMark() && isHeal(itemId))
+		{
+			return new Highlight(config.healMarkColor(), config.specItemOutline(),
+				config.specItemFill(), config.specItemFillOpacity(), config.specItemUnderline(), false);
 		}
 		return null;
 	}
@@ -407,6 +398,12 @@ public class LightbearerHelperPlugin extends Plugin
 	public boolean isSpecItem(int itemId)
 	{
 		return (kind(itemId) & KIND_SPEC) != 0;
+	}
+
+	private boolean isHeal(int itemId)
+	{
+		SpecCosts.Cost cost = specCost(itemId);
+		return cost != null && cost.isHeal();
 	}
 
 	// what the item's special costs, null when unknown
@@ -479,7 +476,7 @@ public class LightbearerHelperPlugin extends Plugin
 		}
 		float intensity = orbPulseFactor();
 		Color from = new Color(originalOrbTextColor);
-		Color to = orbColor();
+		Color to = config.orbColor();
 		int r = lerp(from.getRed(), to.getRed(), intensity);
 		int g = lerp(from.getGreen(), to.getGreen(), intensity);
 		int b = lerp(from.getBlue(), to.getBlue(), intensity);
