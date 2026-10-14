@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 public class LightbearerHelperPlugin extends Plugin
 {
 	// keep in sync with build.gradle
-	public static final String VERSION = "1.0.4";
+	public static final String VERSION = "1.0.5";
 
 	private static final Logger log = LoggerFactory.getLogger(LightbearerHelperPlugin.class);
 
@@ -51,6 +51,7 @@ public class LightbearerHelperPlugin extends Plugin
 	private static final int KIND_LIGHTBEARER = 1;
 	private static final int KIND_RING = 2;
 	private static final int KIND_SPEC = 4;
+	private static final int KIND_RESTORE = 8;
 
 	@Inject
 	private Client client;
@@ -75,12 +76,15 @@ public class LightbearerHelperPlugin extends Plugin
 
 	private ItemMatcher ringMatcher = new ItemMatcher("");
 	private ItemMatcher specMatcher = new ItemMatcher("");
+	private ItemMatcher restoreMatcher = new ItemMatcher("");
 	private final Map<Integer, Integer> kindCache = new HashMap<>();
 	private final Map<Integer, SpecCosts.Cost> costCache = new HashMap<>();
 
 	private volatile HighlightState.Mode mode = HighlightState.Mode.IDLE;
 	private volatile boolean orbHighlightActive;
 	private volatile boolean specItemsActive;
+	// a carried spec weapon is ready but short of prayer: light the restores
+	private volatile boolean restoresActive;
 	private volatile HighlightState.Vitals vitals = new HighlightState.Vitals(0, 0, 0, false);
 	private volatile HighlightState.SpecRules specRules = new HighlightState.SpecRules(100, false, false, 0);
 	private int wornRingId = -1;
@@ -114,6 +118,7 @@ public class LightbearerHelperPlugin extends Plugin
 		mode = HighlightState.Mode.IDLE;
 		orbHighlightActive = false;
 		specItemsActive = false;
+		restoresActive = false;
 		wornRingId = -1;
 		wornWeaponId = -1;
 		kindCache.clear();
@@ -175,6 +180,7 @@ public class LightbearerHelperPlugin extends Plugin
 			mode = HighlightState.Mode.IDLE;
 			orbHighlightActive = false;
 			specItemsActive = false;
+			restoresActive = false;
 		}
 	}
 
@@ -195,6 +201,7 @@ public class LightbearerHelperPlugin extends Plugin
 	{
 		ringMatcher = new ItemMatcher(config.ringList());
 		specMatcher = new ItemMatcher(config.specItemList());
+		restoreMatcher = new ItemMatcher(config.prayerRestoreList());
 		kindCache.clear();
 		costCache.clear();
 	}
@@ -206,6 +213,7 @@ public class LightbearerHelperPlugin extends Plugin
 			mode = HighlightState.Mode.IDLE;
 			orbHighlightActive = false;
 			specItemsActive = false;
+			restoresActive = false;
 			return;
 		}
 
@@ -242,6 +250,28 @@ public class LightbearerHelperPlugin extends Plugin
 		boolean specItemsWanted = config.specItemsAlways() || mode == HighlightState.Mode.WANT_OTHER_RING;
 		specItemsActive = config.highlightSpecItems() && specItemsWanted
 			&& !(config.specSkipIfWielded() && isSpecItem(wornWeaponId));
+		// the restores light whenever a spec weapon of ours is short of prayer, wielded or not
+		restoresActive = config.restoresOnLowPrayer() && config.highlightSpecItems() && specItemsWanted
+			&& carriedHasLowPrayer(inventory);
+	}
+
+	private boolean carriedHasLowPrayer(ItemContainer inventory)
+	{
+		if (isSpecItem(wornWeaponId) && specStatus(wornWeaponId) == HighlightState.SpecStatus.LOW_PRAYER)
+		{
+			return true;
+		}
+		if (inventory != null)
+		{
+			for (Item item : inventory.getItems())
+			{
+				if (isSpecItem(item.getId()) && specStatus(item.getId()) == HighlightState.SpecStatus.LOW_PRAYER)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	// the best status over the wielded weapon and the spec items in the inventory
@@ -358,6 +388,10 @@ public class LightbearerHelperPlugin extends Plugin
 					break;
 			}
 		}
+		if (restoresActive && isRestore(itemId))
+		{
+			return specItemHighlight(config.lowPrayerColor());
+		}
 		// the standing mark on the keris, so it's found at a glance whatever the spec
 		if (config.healAlwaysMark() && isHeal(itemId))
 		{
@@ -398,6 +432,11 @@ public class LightbearerHelperPlugin extends Plugin
 	public boolean isSpecItem(int itemId)
 	{
 		return (kind(itemId) & KIND_SPEC) != 0;
+	}
+
+	public boolean isRestore(int itemId)
+	{
+		return (kind(itemId) & KIND_RESTORE) != 0;
 	}
 
 	private boolean isHeal(int itemId)
@@ -447,6 +486,10 @@ public class LightbearerHelperPlugin extends Plugin
 		if (specMatcher.matches(name))
 		{
 			flags |= KIND_SPEC;
+		}
+		if (restoreMatcher.matches(name))
+		{
+			flags |= KIND_RESTORE;
 		}
 		kindCache.put(itemId, flags);
 		return flags;

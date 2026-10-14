@@ -51,6 +51,18 @@ public class ItemMatcherTest
 	}
 
 	@Test
+	public void defaultPrayerRestores()
+	{
+		ItemMatcher restores = new ItemMatcher(LightbearerHelperConfig.DEFAULT_PRAYER_RESTORES);
+		assertTrue(restores.matches("Prayer potion(4)"));
+		assertTrue(restores.matches("Prayer potion(1)"));
+		assertTrue(restores.matches("Super restore(3)"));
+		assertTrue(restores.matches("Tears of Elidinis(4)"));
+		assertFalse(restores.matches("Saradomin brew(4)"));
+		assertFalse(restores.matches("Prayer regeneration potion(4)"));
+	}
+
+	@Test
 	public void emptyAndNullNeverMatch()
 	{
 		assertTrue(new ItemMatcher("").isEmpty());
